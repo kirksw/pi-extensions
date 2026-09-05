@@ -1,0 +1,412 @@
+[
+  {
+    "scenario": "github",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 3,
+    "elapsedMs": 6924,
+    "usage": {
+      "input": 7298,
+      "output": 109,
+      "toolResult": 992,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_reference_github",
+      "read"
+    ],
+    "answer": "Open pull requests, most recently updated first:\n\n- #104 — Fix retry backoff — author: `ada` — state: open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 5,
+    "elapsedMs": 30921,
+    "usage": {
+      "input": 35901,
+      "output": 1048,
+      "toolResult": 3246,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file"
+    ],
+    "answer": "Open pull requests, most recently updated first:\n\n- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 4814,
+    "usage": {
+      "input": 5215,
+      "output": 55,
+      "toolResult": 826,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_github"
+    ],
+    "answer": "Open pull requests for `octo-org/widget-api`, most recently updated first:\n\n- #104 — Fix retry backoff — author: `ada` — state: open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 7633,
+    "usage": {
+      "input": 16904,
+      "output": 73,
+      "toolResult": 826,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_github"
+    ],
+    "answer": "Open pull requests for `octo-org/widget-api`, most recently updated first:\n\n- #104 — Fix retry backoff — author: `ada` — state: open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 18740,
+    "usage": {
+      "input": 8048,
+      "output": 486,
+      "toolResult": 880,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_github",
+      "context_query_records"
+    ],
+    "answer": "Open pull requests, most recently updated first:\n\n- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 3,
+    "elapsedMs": 8404,
+    "usage": {
+      "input": 7268,
+      "output": 162,
+      "toolResult": 995,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_reference_slack",
+      "read"
+    ],
+    "answer": "- 1773133200.000100 — U-ADA: “Investigating the payment timeout”\n- 1773133260.000200 — B-DEPLOY: “Deploy finished” — belongs to the thread rooted at `1773133200.000100` (U-ADA’s message)."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 11588,
+    "usage": {
+      "input": 8819,
+      "output": 338,
+      "toolResult": 975,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "- `1773133200.000100` — `U-ADA`: “Investigating the payment timeout”\n- `1773133260.000200` — `B-DEPLOY`: “Deploy finished” — this is a thread reply to the first message (`thread_ts: 1773133200.000100`)."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 5712,
+    "usage": {
+      "input": 3657,
+      "output": 106,
+      "toolResult": 828,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_slack"
+    ],
+    "answer": "1. `1773133200.000100` — U-ADA: “Investigating the payment timeout”\n2. `1773133260.000200` — B-DEPLOY: “Deploy finished”\n\nThe B-DEPLOY message belongs to the thread started by U-ADA’s message (`thread_ts: 1773133200.000100`)."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 6988,
+    "usage": {
+      "input": 16876,
+      "output": 81,
+      "toolResult": 828,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_slack"
+    ],
+    "answer": "1. `U-ADA`: “Investigating the payment timeout”\n2. `B-DEPLOY`: “Deploy finished” — this message belongs to the thread started by `U-ADA`’s message."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "fail",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 16076,
+    "usage": {
+      "input": 9002,
+      "output": 526,
+      "toolResult": 881,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_slack",
+      "context_query_records"
+    ],
+    "answer": "The benchmark response did not include an `evidence://` URI. I attempted the available `evidence://slack` identifier unchanged, but it was not recognized, so no channel messages could be retrieved through the required record query."
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 6791,
+    "usage": {
+      "input": 1434,
+      "output": 65,
+      "toolResult": 953,
+      "cost": 0
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments`; phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 9256,
+    "usage": {
+      "input": 8620,
+      "output": 203,
+      "toolResult": 607,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 4609,
+    "usage": {
+      "input": 3672,
+      "output": 42,
+      "toolResult": 953,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_kubernetes"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 5763,
+    "usage": {
+      "input": 9211,
+      "output": 59,
+      "toolResult": 953,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_kubernetes"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 21176,
+    "usage": {
+      "input": 2896,
+      "output": 715,
+      "toolResult": 1021,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_kubernetes",
+      "context_query_records"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 3,
+    "elapsedMs": 6883,
+    "usage": {
+      "input": 4656,
+      "output": 105,
+      "toolResult": 1035,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_reference_aws",
+      "read"
+    ],
+    "answer": "- `r-001`\n- `r-002`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 10657,
+    "usage": {
+      "input": 855,
+      "output": 168,
+      "toolResult": 435,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "- `r-001`\n- `r-002`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 5367,
+    "usage": {
+      "input": 2076,
+      "output": 39,
+      "toolResult": 874,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_aws"
+    ],
+    "answer": "r-001\nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 5750,
+    "usage": {
+      "input": 1473,
+      "output": 46,
+      "toolResult": 874,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_aws"
+    ],
+    "answer": "r-001\nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 16621,
+    "usage": {
+      "input": 5289,
+      "output": 546,
+      "toolResult": 935,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_aws",
+      "context_query_records"
+    ],
+    "answer": "- `r-001`\n- `r-002`"
+  }
+]

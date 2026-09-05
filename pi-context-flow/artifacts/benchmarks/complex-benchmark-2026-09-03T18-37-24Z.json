@@ -1,0 +1,515 @@
+[
+  {
+    "scenario": "linear",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 4,
+    "elapsedMs": 17441,
+    "usage": {
+      "input": 41896,
+      "output": 478,
+      "toolResult": 144156,
+      "cost": 0.098744
+    },
+    "tools": [
+      "read",
+      "read",
+      "read"
+    ],
+    "answer": "1. **PAY-104** — Webhook retries lose idempotency key; **In Progress**; **High**; created **2024-01-08**\n2. **PAY-107** — Settlement export omits failed payouts; **Todo**; **Medium**; created **2024-01-13**\n3. **PAY-112** — Card metadata migration blocks reconciliation; **Blocked**; **Urgent**; created **2024-01-19**\n\nExcluded seemingly older records: **PAY-099** (created 2023-12-01) because it is **Done**; **PLA-001** (created 2023-11-01) because it belongs to the **platform** team, not the current **payments** team."
+  },
+  {
+    "scenario": "linear",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 6,
+    "elapsedMs": 65499,
+    "usage": {
+      "input": 9680,
+      "output": 2909,
+      "toolResult": 11521,
+      "cost": 0.0643032
+    },
+    "tools": [
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file"
+    ],
+    "answer": "Current team: **payments**\n\n| Identifier | Title | State | Priority | Created |\n|---|---|---|---|---|\n| PAY-104 | Webhook retries lose idempotency key | In Progress | High | 2024-01-08 |\n| PAY-107 | Settlement export omits failed payouts | Todo | Medium | 2024-01-13 |\n| PAY-112 | Card metadata migration blocks reconciliation | Blocked | Urgent | 2024-01-19 |\n\nExcluded older-looking records: **PLA-001** is for the platform team, and **PAY-099** is Done."
+  },
+  {
+    "scenario": "linear",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 11965,
+    "usage": {
+      "input": 119785,
+      "output": 225,
+      "toolResult": 453728,
+      "cost": 0.24226999999999999
+    },
+    "tools": [
+      "benchmark_emit_linear"
+    ],
+    "answer": "| Identifier | Title | State | Priority | Created |\n|---|---|---|---|---|\n| PAY-104 | Webhook retries lose idempotency key | In Progress | High | 2024-01-08 |\n| PAY-107 | Settlement export omits failed payouts | Todo | Medium | 2024-01-13 |\n| PAY-112 | Card metadata migration blocks reconciliation | Blocked | Urgent | 2024-01-19 |\n\nExcluded seemingly older records: PAY-099 (2023-12-01) because it is Done; PLA-001 (2023-11-01) because it belongs to the platform team, not payments."
+  },
+  {
+    "scenario": "linear",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 11799,
+    "usage": {
+      "input": 125844,
+      "output": 195,
+      "toolResult": 453728,
+      "cost": 0.2551544
+    },
+    "tools": [
+      "benchmark_emit_linear"
+    ],
+    "answer": "1. **PAY-104** — Webhook retries lose idempotency key; **In Progress**; **High**; created **2024-01-08**  \n2. **PAY-107** — Settlement export omits failed payouts; **Todo**; **Medium**; created **2024-01-13**  \n3. **PAY-112** — Card metadata migration blocks reconciliation; **Blocked**; **Urgent**; created **2024-01-19**\n\nExcluded seemingly older records: **PAY-099** (created 2023-12-01) because it is **Done**; **PLA-001** (2023-11-01) because it belongs to the **platform** team, not the current **payments** team."
+  },
+  {
+    "scenario": "linear",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 13464,
+    "usage": {
+      "input": 4934,
+      "output": 327,
+      "toolResult": 1286,
+      "cost": 0.0140992
+    },
+    "tools": [
+      "benchmark_emit_linear",
+      "context_query_records"
+    ],
+    "answer": "Oldest non-Done Payments issues:\n\n1. **PAY-104** — Webhook retries lose idempotency key — In Progress — High — 2024-01-08\n2. **PAY-107** — Settlement export omits failed payouts — Todo — Medium — 2024-01-13\n3. **PAY-112** — Card metadata migration blocks reconciliation — Blocked — Urgent — 2024-01-19\n\nExcluded seemingly older records: **PAY-099** is Done, and **PLA-001** belongs to Platform rather than Payments."
+  },
+  {
+    "scenario": "github",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 7854,
+    "usage": {
+      "input": 3221,
+      "output": 65,
+      "toolResult": 826,
+      "cost": 0.007221999999999999
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 4,
+    "elapsedMs": 21823,
+    "usage": {
+      "input": 9697,
+      "output": 576,
+      "toolResult": 2192,
+      "cost": 0.02989
+    },
+    "tools": [
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file"
+    ],
+    "answer": "- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 10019,
+    "usage": {
+      "input": 1859,
+      "output": 43,
+      "toolResult": 826,
+      "cost": 0.004234
+    },
+    "tools": [
+      "benchmark_emit_github"
+    ],
+    "answer": "- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 8611,
+    "usage": {
+      "input": 7927,
+      "output": 56,
+      "toolResult": 826,
+      "cost": 0.0176524
+    },
+    "tools": [
+      "benchmark_emit_github"
+    ],
+    "answer": "- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 16471,
+    "usage": {
+      "input": 3417,
+      "output": 403,
+      "toolResult": 890,
+      "cost": 0.012284400000000001
+    },
+    "tools": [
+      "benchmark_emit_github",
+      "context_query_records"
+    ],
+    "answer": "Open pull requests (most recently updated first):\n\n- #104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 8166,
+    "usage": {
+      "input": 3192,
+      "output": 96,
+      "toolResult": 828,
+      "cost": 0.007536
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "1. **U-ADA** — “Investigating the payment timeout”  \n2. **B-DEPLOY** — “Deploy finished” — belongs to the thread rooted at U-ADA’s message."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 14226,
+    "usage": {
+      "input": 2076,
+      "output": 409,
+      "toolResult": 1322,
+      "cost": 0.0113128
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "Chronological channel messages:\n\n1. **U-ADA:** Investigating the payment timeout  \n2. **B-DEPLOY:** Deploy finished — thread reply to message 1\n\nThe second message belongs to a thread."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 7276,
+    "usage": {
+      "input": 1825,
+      "output": 62,
+      "toolResult": 828,
+      "cost": 0.004394
+    },
+    "tools": [
+      "benchmark_emit_slack"
+    ],
+    "answer": "1. U-ADA — “Investigating the payment timeout”\n2. B-DEPLOY — “Deploy finished”\n\n“Deploy finished” belongs to the thread started by “Investigating the payment timeout.”"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 9361,
+    "usage": {
+      "input": 7893,
+      "output": 73,
+      "toolResult": 828,
+      "cost": 0.0177884
+    },
+    "tools": [
+      "benchmark_emit_slack"
+    ],
+    "answer": "1. U-ADA: “Investigating the payment timeout”\n2. B-DEPLOY: “Deploy finished” — belongs to the thread started by U-ADA’s message."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 21703,
+    "usage": {
+      "input": 5231,
+      "output": 697,
+      "toolResult": 896,
+      "cost": 0.0191332
+    },
+    "tools": [
+      "benchmark_emit_slack",
+      "context_query_records"
+    ],
+    "answer": "1. U-ADA — “Investigating the payment timeout”\n2. B-DEPLOY — “Deploy finished” *(thread reply to U-ADA’s message)*"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 7985,
+    "usage": {
+      "input": 3200,
+      "output": 66,
+      "toolResult": 953,
+      "cost": 0.007192
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 9975,
+    "usage": {
+      "input": 1695,
+      "output": 208,
+      "toolResult": 561,
+      "cost": 0.008138800000000002
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 7179,
+    "usage": {
+      "input": 1851,
+      "output": 55,
+      "toolResult": 953,
+      "cost": 0.0043619999999999996
+    },
+    "tools": [
+      "benchmark_emit_kubernetes"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 7843,
+    "usage": {
+      "input": 7920,
+      "output": 67,
+      "toolResult": 953,
+      "cost": 0.0177704
+    },
+    "tools": [
+      "benchmark_emit_kubernetes"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 16701,
+    "usage": {
+      "input": 2040,
+      "output": 509,
+      "toolResult": 1011,
+      "cost": 0.0111096
+    },
+    "tools": [
+      "benchmark_emit_kubernetes",
+      "context_query_records"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 9135,
+    "usage": {
+      "input": 3144,
+      "output": 54,
+      "toolResult": 874,
+      "cost": 0.0069359999999999995
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "r-001  \nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 10685,
+    "usage": {
+      "input": 1698,
+      "output": 213,
+      "toolResult": 583,
+      "cost": 0.0082048
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "r-001  \nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 7811,
+    "usage": {
+      "input": 1788,
+      "output": 40,
+      "toolResult": 874,
+      "cost": 0.004056
+    },
+    "tools": [
+      "benchmark_emit_aws"
+    ],
+    "answer": "r-001  \nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 7587,
+    "usage": {
+      "input": 2225,
+      "output": 48,
+      "toolResult": 874,
+      "cost": 0.0072788
+    },
+    "tools": [
+      "benchmark_emit_aws"
+    ],
+    "answer": "r-001  \nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 18950,
+    "usage": {
+      "input": 1710,
+      "output": 324,
+      "toolResult": 935,
+      "cost": 0.0082296
+    },
+    "tools": [
+      "benchmark_emit_aws",
+      "context_query_records"
+    ],
+    "answer": "- r-001\n- r-002"
+  }
+]
