@@ -83,3 +83,23 @@ Do not assume protection equivalent to a container running inside a Linux VM.
 - Compare startup latency, installation effort, runtime reproducibility, and maintenance cost before promoting a backend from experimental to supported.
 
 References: [bubblewrap documentation](https://github.com/containers/bubblewrap) and [sandbox-exec deprecation notice](https://keith.github.io/xcode-man-pages/sandbox-exec.1.html).
+
+## Context Out: lifecycle foundation and remaining gaps
+
+[ADR 006](adrs/006-observation-lifecycle-survives-worktree-evidence.md) defines the lifecycle contract.
+See the [implementation plan and execution notes](plans/context-out-lifecycle.md) for design choices, acceptance gates, and limitations.
+The event-backed observation, lifecycle, proposal, migration, and scoped retrieval foundation is implemented.
+Events are stored under `~/.config/pi-context-flow/`, partitioned by canonical-remote-derived repository identity, with distinct clone/worktree provenance.
+Raw evidence remains worktree-local; retrieval reports support availability separately from claim state and freshness.
+
+Remaining work:
+
+- Replace full in-memory event replay and full projection refresh with bounded incremental ingestion for large histories.
+- Strengthen native query and filesystem assessment deadlines where hard termination is required; current deadlines are cooperative.
+- Provide explicit identity reassociation and verified abandoned-session-lock recovery workflows.
+- Add a read-only cross-origin evidence adapter if explicit inspection beyond missing-origin detection is required.
+- Add candidate approval/rejection/deferral and repository-scoped reviewed knowledge, with explicit support decisions or reviewer exceptions.
+- Add lexical FTS and semantic retrieval-assisted consolidation only after the review lifecycle is usable.
+
+The proposal inbox is not an approval gate and does not create authoritative repository knowledge.
+Evidence-copying and purge automation remain deferred; no automatic expiration is approved.

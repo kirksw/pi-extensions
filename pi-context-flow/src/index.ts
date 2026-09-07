@@ -2,12 +2,20 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 import { ContextStore } from "./store.js";
+import { ContextOutStore } from "./context-out/store.js";
 
 const MAX_INLINE_BYTES = 8_192;
 const MAX_TOOL_TEXT_BYTES = 64 * 1024;
 const NATIVE_NAVIGATION_TOOLS = new Set(["read", "grep", "find", "ls"]);
 
-export default function (pi: ExtensionAPI) {
+export default function registerContextFlow(pi: ExtensionAPI, options: { home?: string; contextOut?: ContextOutStore } = {}) {
+  const contextOut = options.contextOut ?? new ContextOutStore({ home: options.home });
+  pi.on("session_shutdown", async () => { await contextOut.close(); });
+  const out = (value: unknown) => {
+    const json = JSON.stringify(value);
+    const bounded = Buffer.byteLength(json) <= 30000 ? value : { version: 1, truncated: true, warning: "Response exceeds budget; request a smaller page or provenance/history section", preview: json.slice(0, 4000) };
+    return { content: [{ type: "text" as const, text: JSON.stringify(bounded) }], details: bounded };
+  };
   const stores = new Map<string, ContextStore>();
   const storeFor = async (cwd: string) => {
     let store = stores.get(cwd);
@@ -104,9 +112,30 @@ export default function (pi: ExtensionAPI) {
     async execute(_id, params, _signal, _update, ctx) { const store = await storeFor(ctx.cwd); const result = await store.repl(params); return output(store, result.outputEvidence?.evidenceId ?? "repl", result, { invocationId: result.invocationId }); },
   });
 
-  // Context Out remains the original explicit, governed operation set.
-  pi.registerTool({ name: "context_observe", label: "Record Observation", description: "Record a compact, durable semantic conclusion with evidence and query provenance.", parameters: Type.Object({ text: Type.String(), category: StringEnum(["decision", "constraint", "failed_approach", "relationship", "unresolved_work", "operational_knowledge", "other"] as const), evidenceIds: Type.Array(Type.String()), queryIds: Type.Array(Type.String()) }), async execute(_id, params, _signal, _update, ctx) { const observation = await (await storeFor(ctx.cwd)).observe(params); return { content: [{ type: "text", text: `Recorded observation://${observation.observationId}.` }], details: { observation } }; } });
-  pi.registerTool({ name: "context_promote", label: "Propose Artifact", description: "Create a candidate for a durable repository, architecture, or organization artifact. Never writes the proposed artifact.", parameters: Type.Object({ observationId: Type.String(), scope: StringEnum(["repo", "architecture", "organization"] as const), target: Type.String(), rationale: Type.String() }), async execute(_id, params, _signal, _update, ctx) { const candidate = await (await storeFor(ctx.cwd)).promote(params); return { content: [{ type: "text", text: `Created artifact candidate://${candidate.candidateId} for ${candidate.target}. No artifact was written.` }], details: { candidate } }; } });
+  const retryKey = Type.Optional(Type.String({ minLength: 1, maxLength: 4096 }));
+  const scope = Type.Optional(StringEnum(["worktree", "repository"] as const));
+  const pageParameters = { scope, query: Type.Optional(Type.String({ maxLength: 1024 })), history: Type.Optional(Type.Boolean()),
+    branch: Type.Optional(Type.String()), revision: Type.Optional(Type.String()), cursor: Type.Optional(Type.String()),
+    limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 100 })), scanLimit: Type.Optional(Type.Integer({ minimum: 1, maximum: 1000 })) };
+  pi.registerTool({ name: "context_observe", label: "Record Observation", description: "Commit a durable conclusion and local evidence/query snapshots. Git required. Retry key defaults to tool invocation ID; reuse it for uncertain commits. No raw copying.",
+    parameters: Type.Object({ text: Type.String(), category: StringEnum(["decision", "constraint", "failed_approach", "relationship", "unresolved_work", "operational_knowledge", "other"] as const), evidenceIds: Type.Array(Type.String(), { maxItems: 128 }), queryIds: Type.Array(Type.String(), { maxItems: 128 }), retryKey }),
+    async execute(id, params, _signal, _update, ctx) { return out(await contextOut.observe(ctx.cwd, ctx.sessionManager.getSessionId(), params.retryKey ?? id, params, () => storeFor(ctx.cwd))); } });
+  pi.registerTool({ name: "context_promote", label: "Propose Artifact", description: "Commit a pending artifact proposal for an active owned observation. Never approves knowledge, changes visibility, or writes an artifact.",
+    parameters: Type.Object({ observationId: Type.String(), scope: StringEnum(["repo", "architecture", "organization"] as const), target: Type.String(), rationale: Type.String(), retryKey }),
+    async execute(id, params, _signal, _update, ctx) { return out(await contextOut.promote(ctx.cwd, ctx.sessionManager.getSessionId(), params.retryKey ?? id, params)); } });
+  pi.registerTool({ name: "context_search_observations", label: "Search Observations", description: "Bounded lexical search; worktree default, repository explicitly cross-origin. No age cutoff. History opt-in; cursor invalidates on new events. At most 1000 rows/1MiB scanned, 2 seconds querying, 64KiB response. Replay is not bounded by these query budgets.",
+    parameters: Type.Object(pageParameters), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.search(ctx.cwd, params)); } });
+  pi.registerTool({ name: "context_read_observation", label: "Read Observation", description: "Read one scoped claim including lifecycle and recorded origin. Optional support inspection hashes fixed local raw files (8MiB/2 seconds); cross-origin support remains unverified or unavailable. At most 64KiB response.",
+    parameters: Type.Object({ observationId: Type.String(), scope, assess: Type.Optional(Type.Boolean()) }), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.read(ctx.cwd, params.observationId, params)); } });
+  pi.registerTool({ name: "context_inspect_observation", label: "Inspect Observation Provenance", description: "Inspect immutable provenance snapshots or event history in JSON-text chunks. Character offset pagination, 2000 characters per chunk, <=64KiB response. Query definitions may contain sensitive literals. No raw evidence content.",
+    parameters: Type.Object({ observationId: Type.String(), scope, section: StringEnum(["provenance", "history"] as const), offset: Type.Optional(Type.Integer({ minimum: 0 })) }), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.inspect(ctx.cwd, params.observationId, params)); } });
+  pi.registerTool({ name: "context_observation_lifecycle", label: "Change Observation Lifecycle", description: "Explicitly retract, supersede, or link another supporting observation. Requires current head event as predecessor and same-worktree active ownership. Does not approve or delete anything.",
+    parameters: Type.Object({ observationId: Type.String(), action: StringEnum(["retract", "supersede", "link_support"] as const), predecessorEventId: Type.String(), relatedObservationId: Type.Optional(Type.String()), reason: Type.Optional(Type.String()), retryKey }),
+    async execute(id, params, _signal, _update, ctx) { return out(await contextOut.lifecycle(ctx.cwd, ctx.sessionManager.getSessionId(), params.retryKey ?? id, params)); } });
+  pi.registerTool({ name: "context_candidate_inbox", label: "List Candidate Proposals", description: "Bounded proposal-only inbox. Worktree default; explicit repository scope. Status proposed means pending review, never approved. No 21-day exclusion. At most 64KiB response.",
+    parameters: Type.Object(pageParameters), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.search(ctx.cwd, params, true)); } });
+  pi.registerTool({ name: "context_migrate_legacy", label: "Migrate Legacy Context Out", description: "Explicit selected-worktree legacy dry-run/import. Does not initialize the legacy store, delete tables, or copy raw content. Close legacy writers first. Imports only consistent ledger-backed records; unresolved lineage is reported. Repeated import is idempotent. At most 64KiB response.",
+    parameters: Type.Object({ mode: StringEnum(["dry-run", "import"] as const) }), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.migrate(ctx.cwd, params.mode)); } });
   pi.registerTool({ name: "context_get_evidence", label: "Get Bounded Evidence Preview", description: "Compatibility tool: retrieve at most 16KiB of evidence. Use context_read for exact ranges.", parameters: Type.Object({ evidenceId: Type.String(), maxBytes: Type.Optional(Type.Integer({ minimum: 1, maximum: 16384 })) }), async execute(_id, params, _signal, _update, ctx) { const store = await storeFor(ctx.cwd); return output(store, params.evidenceId, await store.getEvidence(params.evidenceId, params.maxBytes), { evidenceId: params.evidenceId }); } });
 }
 

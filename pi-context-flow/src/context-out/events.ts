@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdir, open, readdir, lstat, rmdir } from "node:fs/promises";
 import type { FileHandle } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { TextDecoder } from "node:util";
 import type { ContextOutIdentity } from "./identity.js";
 
@@ -165,6 +165,7 @@ export async function openContextOutEventWriter(identity: ContextOutIdentity, se
     writerId = randomUUID(); sequence = 0;
     handle = await open(join(dir, `${writerId}.jsonl`), "wx", 0o600);
     await handle.sync(); await syncDirectory(dir); await syncDirectory(trusted.eventsRoot);
+    await syncDirectory(trusted.repositoryRoot); await syncDirectory(dirname(trusted.repositoryRoot)); await syncDirectory(trusted.storageRoot);
   }
   try { await replayContextOutEvents(trusted, sessionId); await fresh(); }
   catch (e) { await handle?.close(); await rmdir(lock); throw e; }

@@ -110,3 +110,18 @@ for (const stage of ["beforeAppend", "afterAppend", "afterSync"] as const) {
     assert.equal((await replayContextOutEvents(identity)).records.length, 1);
   });
 }
+
+test("separate processes preserve session shards and release ownership on clean exit", async t => {
+  const identity = await fixture(t);
+  const { execFile } = await import("node:child_process");
+  const { promisify } = await import("node:util");
+  const run = promisify(execFile);
+  const modulePath = new URL("../src/context-out/events.ts", import.meta.url).href;
+  const code = `import { openContextOutEventWriter } from ${JSON.stringify(modulePath)};
+    const writer = await openContextOutEventWriter(JSON.parse(process.argv[1]), process.argv[2]);
+    for (let n = 0; n < 4; n++) await writer.append({ idempotencyKey: String(n), subjectId: 'obs-'+n, type:'observation.created', metadata:{branch:null,branchState:'unknown',revision:null,workingTree:'unknown'},payload:{text:'child'} });
+    await writer.close();`;
+  await Promise.all(["child-a", "child-b"].map(session => run(process.execPath, ["--import", "tsx", "--input-type=module", "-e", code, JSON.stringify(identity), session])));
+  assert.equal((await replayContextOutEvents(identity)).records.length, 8);
+  const reopened = await openContextOutEventWriter(identity, "child-a"); await reopened.close();
+});

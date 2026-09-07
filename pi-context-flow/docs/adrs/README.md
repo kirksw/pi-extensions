@@ -19,3 +19,4 @@ The `status` field expresses its lifecycle.
 | [003](003-promotion-is-a-semantic-review-gate.md) | Use semantic review for promotion. | active |
 | [004](004-consolidation-creates-reviewable-promotion-candidates.md) | Consolidate observations into reviewable promotion candidates. | active |
 | [005](005-evidence-references-expose-bounded-analysis-capabilities.md) | Replace large outputs with queryable evidence references and use a read-only REPL only as a fallback. | active |
+| [006](006-observation-lifecycle-survives-worktree-evidence.md) | Preserve observations beyond worktree lifetime and report support availability independently. | active |

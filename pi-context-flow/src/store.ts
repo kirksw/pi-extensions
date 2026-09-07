@@ -182,6 +182,39 @@ export class ContextStore {
     return { evidence: `evidence://${metadata.evidenceId}`, type: metadata.shape, source: metadata.source, sizeBytes: metadata.sizeBytes, capturedAt: metadata.timestamp, sha256: metadata.sha256, dependencies: metadata.dependencies.map((id) => `evidence://${id}`), ...(role && transportEvidenceId ? { jsonRpc: { role, requestId, transportEvidence: `evidence://${transportEvidenceId}` } } : {}) };
   }
 
+  async observationProvenance(input: { evidenceIds: string[]; queryIds: string[] }): Promise<{
+    evidence: Array<Omit<EvidenceMetadata, "arguments" | "rawPath"> & { coverage: "unknown" | "partial" }>;
+    queries: Array<QueryRecord & { outputEvidenceId: string | null }>;
+  }> {
+    const evidence: Array<Omit<EvidenceMetadata, "arguments" | "rawPath"> & { coverage: "unknown" | "partial" }> = [];
+    const queries: Array<QueryRecord & { outputEvidenceId: string | null }> = [];
+    const pending = input.evidenceIds.map(normalizeEvidenceId);
+    const queryIds = [...new Set(input.queryIds.map((id) => id.replace(/^query:\/\//, "")))];
+    if (pending.length + queryIds.length > 128) throw new Error("Observation provenance exceeds 128 references");
+    for (const queryId of queryIds) {
+      const row = (await this.all("SELECT * FROM evidence_queries WHERE query_id = ?", [queryId]))[0];
+      if (!row) throw new Error(`Unknown query ID: ${queryId}`);
+      const outputEvidenceId = row.output_evidence_id == null ? null : String(row.output_evidence_id);
+      queries.push({ queryId, evidenceId: String(row.evidence_id), language: String(row.language) as QueryRecord["language"], query: String(row.query_text), timestamp: String(row.timestamp), outputEvidenceId });
+      pending.push(String(row.evidence_id));
+      if (outputEvidenceId) pending.push(outputEvidenceId);
+    }
+    const seen = new Set<string>();
+    for (let index = 0; index < pending.length; index++) {
+      const id = normalizeEvidenceId(pending[index]);
+      if (seen.has(id)) continue;
+      if (seen.size >= 128) throw new Error("Observation provenance exceeds 128 evidence dependencies");
+      seen.add(id);
+      const { arguments: args, rawPath: _rawPath, ...metadata } = await this.metadata(id);
+      const kind = args && typeof args === "object" ? (args as Record<string, unknown>).kind : undefined;
+      evidence.push({ ...metadata, coverage: kind === "sql_output" || metadata.source.includes("partial:") ? "partial" : "unknown" });
+      pending.push(...metadata.dependencies);
+      if (Buffer.byteLength(JSON.stringify({ evidence, queries }), "utf8") > 192 * 1024) throw new Error("Observation provenance exceeds 192 KiB");
+    }
+    if (Buffer.byteLength(JSON.stringify({ evidence, queries }), "utf8") > 192 * 1024) throw new Error("Observation provenance exceeds 192 KiB");
+    return { evidence, queries };
+  }
+
   async describeRelation(evidenceId: string, detail: "compact" | "full" = "compact"): Promise<RelationDescription> {
     const metadata = await this.metadata(normalizeEvidenceId(evidenceId));
     if (!isStructuredShape(metadata.shape) && metadata.shape !== "mixed") throw new Error("DuckDB relations are available only for structured or mixed evidence.");
