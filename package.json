@@ -1,0 +1,14 @@
+{
+  "name": "pi-extensions",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Collection of custom Pi extensions.",
+  "keywords": ["pi-package"],
+  "type": "module",
+  "pi": {
+    "extensions": ["./pi-context-flow/src/index.ts"]
+  },
+  "scripts": {
+    "postinstall": "npm ci --prefix pi-context-flow"
+  }
+}
