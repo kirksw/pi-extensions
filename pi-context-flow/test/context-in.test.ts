@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, join, resolve } from "node:path";
 
 const stressFixture = (name: string) => readFile(join(process.cwd(), "fixtures", "record-query-stress", name), "utf8");
 import test from "node:test";
@@ -300,6 +300,22 @@ test("jq uses an allowlisted environment and stages complete oversized output", 
 });
 
 test("REPL stages oversized container output when a usable container runtime is present", async (t) => {
+  const command = promisify(execFile);
+  const options = { timeout: 2000, env: { PATH: "/usr/local/bin:/usr/bin:/bin" } };
+  let runtime: string | undefined;
+  for (const name of ["docker", "podman"]) {
+    for (const directory of (process.env.PATH ?? "").split(delimiter)) {
+      const candidate = resolve(directory, name);
+      try { await command(candidate, ["version", "--format", "{{.Server.Version}}"], options); runtime = candidate; break; } catch {}
+    }
+    if (runtime) break;
+  }
+  if (!runtime) return t.skip("Docker/Podman server unavailable");
+  try { await command(runtime, ["image", "inspect", "bash:5.2"], options); }
+  catch (error) {
+    if (/No such image|image not known/i.test(String(error))) return t.skip("Required cached bash:5.2 image missing; no pulls performed");
+    throw error;
+  }
   const store = await makeStore();
   const result = await store.repl({ language: "bash", code: "yes x | head -c 70000" });
   if (!result.available) { t.skip("Docker/Podman server or cached bash image is unavailable"); return; }

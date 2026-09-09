@@ -24,11 +24,11 @@ async function harness(t: TestContext) {
   assert.ok(handler, "extension registers the actual tool-result hook");
   return {
     cwd,
-    async invoke(content: unknown, toolName = "mcp_call") {
-      const event = { type: "tool_result", toolCallId: "call-1", toolName, input: { request: "original" }, content, details: { original: true }, isError: false } as ToolResultEvent;
+    async invoke(content: unknown, toolName = "mcp_call", isError = false, details: unknown = { original: true }) {
+      const event = { type: "tool_result", toolCallId: "call-1", toolName, input: { request: "original" }, content, details, isError } as ToolResultEvent;
       const result = await handler!(event, { cwd } as ExtensionContext);
       assert.equal(event.content, content, "hook never mutates original content");
-      assert.deepEqual(event.details, { original: true });
+      assert.equal(event.details, details);
       return result;
     },
     async rawFiles() {
@@ -156,5 +156,54 @@ test("hook never replaces source results when initialization, capture, or refere
       assert.equal(await h.invoke([text(data), text(log)]), undefined);
       assert.equal(errors.mock.callCount(), 1);
     });
+  }
+});
+
+for (const [name, raw] of [
+  ["comma-rich prose", "This is prose, not data.\nIt contains commas, like normal writing.\nMore explanations, not records.\n" + "Normal prose. ".repeat(800)],
+  ["source containing INFO", 'const INFO = "message";\n' + "const value = 42;\n".repeat(600)],
+]) test(`review: hook bypasses ${name}`, async (t) => {
+  const h = await harness(t);
+  assert.ok(Buffer.byteLength(raw) > 8192);
+  assert.equal(await h.invoke([text(raw)]), undefined);
+  assert.deepEqual(await readdir(h.cwd), []);
+});
+
+test("review: captured errors preserve effective error flag and meaningful source details", async (t) => {
+  const h = await harness(t);
+  const result = await h.invoke([text(log)], "mcp_call", true);
+  reference(result);
+  assert.equal(result?.isError ?? true, true);
+  assert.equal((result?.details as { original?: boolean })?.original, true);
+});
+
+test("hook captures unambiguous quoted CSV and TSV with matching shapes", async (t) => {
+  const h = await harness(t);
+  for (const [shape, raw] of [
+    ["csv", 'id,state\n' + '1,"open, pending\ncontinued"\n'.repeat(400)],
+    ["tsv", 'id\tstate\n' + '1\topen\n'.repeat(1400)],
+  ]) {
+    assert.equal(reference(await h.invoke([text(raw)])).type, shape);
+    assert.ok((await h.rawFiles()).some((file) => file.raw === raw));
+  }
+});
+
+test("hook retains severity-prefixed logs and bypasses embedded severity prose", async (t) => {
+  const h = await harness(t);
+  assert.equal(await h.invoke([text('This prose mentions INFO in a sentence.\n'.repeat(300))]), undefined);
+  for (const raw of ['INFO service ready\n'.repeat(500), '[WARN] service retrying\n'.repeat(500)]) {
+    assert.equal(reference(await h.invoke([text(raw)])).type, "mixed");
+  }
+});
+
+test("hook preserves colliding and non-object source details without overwriting source keys", async (t) => {
+  const h = await harness(t);
+  for (const details of [{ contextFlow: { owner: "source" }, sourceDetails: "original-key", original: true }, ["array-details"], "text-details", null]) {
+    const result = await h.invoke([text(data)], "mcp_call", false, details);
+    const merged = result?.details as { contextFlow: { captured: boolean; sourceDetails: unknown }; sourceDetails?: string };
+    assert.equal(merged.contextFlow.captured, true);
+    assert.deepEqual(merged.contextFlow.sourceDetails, details);
+    if (details && !Array.isArray(details) && typeof details === "object") assert.equal(merged.sourceDetails, "original-key");
+    assert.equal(result?.isError ?? false, false);
   }
 });

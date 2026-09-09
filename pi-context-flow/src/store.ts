@@ -8,7 +8,10 @@ import { tmpdir } from "node:os";
 import duckdb from "duckdb";
 import { XMLParser, XMLValidator } from "fast-xml-parser";
 import { parseDocument } from "yaml";
+import { storeDatabase } from "./store-database.js";
 import { analyzeSql } from "./sql-analysis.js";
+import { looksLog } from "./log-format.js";
+import { looksDelimited as looksAutoDelimited } from "./delimited.js";
 import { createId, timestamp } from "./ids.js";
 import type { ArtifactCandidate, EvidenceMetadata, EvidenceReference, EvidenceShape, Observation } from "./types.js";
 
@@ -57,8 +60,6 @@ export class ContextStore {
   private readonly queryDirectory: string;
   private readonly dbPath: string;
   private readonly cwd: string;
-  private database?: duckdb.Database;
-  private connection?: duckdb.Connection;
 
   constructor(cwd: string) {
     this.cwd = resolve(cwd);
@@ -432,7 +433,7 @@ export class ContextStore {
       // A clipped jq document is not valid derived data. Return only a marked preview in that case.
       const result = output.truncated || staged.outputLimitReached
         ? { truncated: true, complete: false, preview: output.text }
-        : raw.trim() ? JSON.parse(raw) : null;
+        : parseJqStream(raw);
       return { query, result, outputEvidence: outputEvidence ? this.referenceFor(outputEvidence) : undefined, truncated: output.truncated || staged.outputLimitReached };
     } finally { await rm(staged.directory, { recursive: true, force: true }); }
   }
@@ -530,28 +531,13 @@ export class ContextStore {
   private async recordQuery(query: QueryRecord, outputEvidenceId?: string): Promise<void> { await this.run("INSERT INTO evidence_queries VALUES (?, ?, ?, ?, ?, ?)", [query.queryId, query.evidenceId, query.language, query.query, query.timestamp, outputEvidenceId ?? null]); }
   private async chunkCount(evidenceId: string): Promise<number> { return Number((await this.all("SELECT count(*) AS count FROM text_chunks WHERE evidence_id = ?", [evidenceId]))[0]?.count ?? 0); }
   private async exec(sql: string): Promise<void> {
-    await this.withConnection((connection) => new Promise<void>((ok, fail) => connection.exec(sql, (error) => error ? fail(error) : ok())));
+    await storeDatabase(this.dbPath, "exec", sql);
   }
   private async all(sql: string, values: unknown[] = []): Promise<duckdb.TableData> {
-    let lastError: unknown;
-    for (let attempt = 0; attempt < 5; attempt++) {
-      try { return await this.withConnection((connection) => new Promise<duckdb.TableData>((ok, fail) => connection.all(sql, ...values, (error, result) => error ? fail(error) : ok(result)))); }
-      catch (error) { lastError = error; if (!/Connection was never established|Connection was already closed/.test(String(error)) || attempt === 4) throw error; }
-      await new Promise((resolveWait) => setTimeout(resolveWait, 25));
-    }
-    throw lastError;
+    return storeDatabase(this.dbPath, "all", sql, values);
   }
   private async run(sql: string, values: unknown[]): Promise<void> {
-    await this.withConnection((connection) => new Promise<void>((ok, fail) => connection.run(sql, ...values, (error) => error ? fail(error) : ok())));
-  }
-  private async withConnection<T>(operation: (connection: duckdb.Connection) => Promise<T>): Promise<T> {
-    if (!this.connection) {
-      this.database = new duckdb.Database(this.dbPath);
-      this.connection = this.database.connect();
-      // The native handle is not always ready in the same tick as connect().
-      await new Promise((resolveWait) => setTimeout(resolveWait, 5));
-    }
-    return operation(this.connection);
+    await storeDatabase(this.dbPath, "run", sql, values);
   }
 }
 
@@ -632,12 +618,12 @@ function classify(raw: string, path?: string): EvidenceShape {
   try { JSON.parse(raw); return "json"; } catch { /* not JSON */ }
   const lowerPath = path?.toLowerCase() ?? "";
   // Extension hints disambiguate files; content detection also classifies tool-result payloads.
-  if ((/\.tsv$/u.test(lowerPath) || (!lowerPath && looksDelimited(raw, "\t"))) && looksDelimited(raw, "\t")) return "tsv";
-  if ((/\.csv$/u.test(lowerPath) || (!lowerPath && looksDelimited(raw, ","))) && looksDelimited(raw, ",")) return "csv";
+  if ((/\.tsv$/u.test(lowerPath) && looksDelimited(raw, "\t")) || (!lowerPath && looksAutoDelimited(raw, "\t"))) return "tsv";
+  if ((/\.csv$/u.test(lowerPath) && looksDelimited(raw, ",")) || (!lowerPath && looksAutoDelimited(raw, ","))) return "csv";
   if ((/\.xml$/u.test(lowerPath) || !lowerPath) && /^\s*<\?xml(?:\s|\?>)/u.test(raw)) return "xml";
   if ((/\.(?:yaml|yml)$/u.test(lowerPath) || !lowerPath) && looksYaml(raw)) return "yaml";
   const lines = raw.split(/\r?\n/); const jsonLines = lines.filter((line) => { try { JSON.parse(line); return true; } catch { return false; } }).length;
-  return jsonLines > 0 || /^(?:\d{4}-\d\d-\d\d|\[[^\]]+\])|\b(?:ERROR|WARN|INFO|DEBUG)\b/m.test(raw) ? "mixed" : "text";
+  return jsonLines > 0 || looksLog(raw) ? "mixed" : "text";
 }
 function looksDelimited(raw: string, delimiter: string): boolean { const lines = raw.split(/\r?\n/).filter(Boolean).slice(0, 3); return lines.length >= 2 && lines.every((line) => line.includes(delimiter)); }
 function looksYaml(raw: string): boolean { return /^(?:---\s*$|[A-Za-z_][\w-]*:\s*[^\n]*)/m.test(raw); }
@@ -786,7 +772,18 @@ function findExecutable(name: string): string | undefined {
   return undefined;
 }
 
-async function containerRuntime(): Promise<"docker" | "podman" | undefined> { for (const runtime of ["docker", "podman"] as const) try { await execFile(runtime, ["version", "--format", "{{.Server.Version}}"], { timeout: 2_000, env: {}, windowsHide: true }); return runtime; } catch {} return undefined; }
+async function containerRuntime(): Promise<string | undefined> {
+  for (const name of ["docker", "podman"]) {
+    for (const directory of (process.env.PATH ?? "").split(delimiter)) {
+      const executable = resolve(directory, name);
+      try {
+        await execFile(executable, ["version", "--format", "{{.Server.Version}}"], { timeout: 2_000, env: SAFE_COMMAND_ENV, windowsHide: true });
+        return executable;
+      } catch { /* Try the next PATH entry or runtime without inheriting credentials. */ }
+    }
+  }
+  return undefined;
+}
 async function copyLimited(source: string, target: string, usedBytes: number): Promise<number> { const info = await stat(source); if (info.size > MAX_REPL_INPUT_BYTES || usedBytes + info.size > MAX_REPL_INPUT_BYTES) throw new Error(`Selected inputs exceed the ${MAX_REPL_INPUT_BYTES} byte REPL input limit.`); await mkdir(dirname(target), { recursive: true }); await copyFile(source, target); return usedBytes + info.size; }
 async function closeDatabase(connection: duckdb.Connection, db: duckdb.Database): Promise<void> {
   // Timed queries may already have closed their isolated connection.
@@ -802,4 +799,28 @@ function describeJson(value: unknown, path = "$", result: unknown[] = [], depth 
   if (Array.isArray(value)) { result.push({ path, type: "array", sampleLength: value.length }); if (value.length) describeJson(value[0], `${path}[0]`, result, depth + 1, maxDepth, maxNodes); }
   else if (value !== null && typeof value === "object") { result.push({ path, type: "object", keys: Object.keys(value as Record<string, unknown>) }); for (const [key, child] of Object.entries(value as Record<string, unknown>)) { if (result.length >= maxNodes) break; describeJson(child, `${path}.${key}`, result, depth + 1, maxDepth, maxNodes); } }
   else result.push({ path, type: value === null ? "null" : typeof value }); return result;
+}
+
+function parseJqStream(raw: string): unknown {
+  // jq emits whitespace-separated documents; only split outside strings and containers.
+  const documents: unknown[] = [];
+  let start = 0, depth = 0, quoted = false, escaped = false;
+  for (let i = 0; i <= raw.length; i++) {
+    const char = raw[i];
+    if (!quoted && depth === 0 && (i === raw.length || /\s/u.test(char))) {
+      const document = raw.slice(start, i).trim();
+      if (document) documents.push(JSON.parse(document));
+      start = i + 1;
+      continue;
+    }
+    if (quoted) {
+      if (escaped) escaped = false;
+      else if (char === "\\") escaped = true;
+      else if (char === '"') quoted = false;
+    } else if (char === '"') quoted = true;
+    else if (char === "{" || char === "[") depth++;
+    else if (char === "}" || char === "]") depth--;
+  }
+  if (quoted || depth !== 0) throw new Error("Incomplete jq output document.");
+  return documents.length === 0 ? null : documents.length === 1 ? documents[0] : documents;
 }

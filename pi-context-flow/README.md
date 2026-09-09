@@ -10,6 +10,12 @@ Context Out remains explicit and governed: observations and artifact candidates 
   Automatic interception accepts only plain, safely serializable text blocks, and every block must independently qualify as JSON/JSONL, CSV/TSV, XML with a declaration, conservative YAML, or a recognizable log.
   Multi-item captures preserve content order and chunk boundaries in a deterministic envelope; single-text captures retain the original text and JSON-RPC handling.
   Mixed image/text, unsupported or cyclic content, source, prose, binary, unknown text, `read`, `grep`, `find`, `ls`, and every `context_*` result bypass interception.
+  Automatic CSV/TSV detection requires a simple unique header and consistent field counts across the complete quote-aware payload; ambiguous tables remain inline.
+  Explicit extension-hinted CSV/TSV file capture retains its existing format detection.
+  Log recognition requires every line to start with a severity label (optionally bracketed or preceded by an ISO-style timestamp) and a message.
+  Ambiguous multiline logs remain inline; JSONL and YAML detection are unchanged.
+  Original object detail keys are preserved; colliding `contextFlow` details or non-object details are retained under `details.contextFlow.sourceDetails`.
+  The original error flag is unchanged.
   Capture metadata and capabilities remain in result details; use `context_metadata` for model-visible provenance and `context_schema` for structured analysis.
 - JSON, CSV/TSV, XML, and YAML are schema-inspectable and available to one strict, read-only DuckDB query.
   CSV/TSV are imported directly by DuckDB; XML and YAML are validated and parsed locally with entity expansion and YAML aliases disabled, then materialized only in the isolated in-memory query relation.
@@ -134,6 +140,13 @@ Native projection queries are not forcibly interrupted, and closed disposable ca
 ```
 
 Context In DuckDB records evidence provenance, text chunks, derived materializations, queries, and REPL invocations.
+Each database operation runs in a short-lived subprocess under an exclusive `.pi/context/state.duckdb.lock`; the lock is released only after that subprocess exits.
+Lock acquisition waits at most two seconds, including the in-process queue, then reports a busy-store error.
+Database operations have a separate ten-second deadline; a timeout can leave completion uncertain.
+The lock records PID, hostname, and acquisition time; abandoned locks are never stolen automatically.
+After a crash, confirm both the recorded owner and its database child have stopped before manually removing the lock.
+Close older extension processes before upgrading because they do not participate in this locking protocol.
+Subprocess startup adds overhead to each metadata/index operation.
 Legacy observation/promotion tables remain untouched for migration.
 New Context Out events live outside the worktree:
 
@@ -166,4 +179,7 @@ git diff --check
 ```
 
 `context_query_jq` requires `jq` on `PATH`.
+Empty jq output returns `null`, one document returns its value, and multiple documents return an ordered array.
+Pretty-printed documents and escaped strings are supported without changing retained raw output.
 `context_repl` requires a usable Docker or Podman server; its integration can be unavailable on development hosts without one.
+Runtime discovery resolves executables from the caller PATH and uses the resolved path for execution, without forwarding the caller environment.

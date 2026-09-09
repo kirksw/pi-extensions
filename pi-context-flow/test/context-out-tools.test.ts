@@ -144,3 +144,23 @@ test("availability verifies evidence exactly at the declared byte budget", async
     assert.equal(results[0].status, "available");
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("review: restart then supersede and propose never writes authoritative documents", async () => {
+  const { root, repo, home } = await fixture();
+  const { rm, readFile } = await import("node:fs/promises");
+  const target = join(repo, "AGENTS.md");
+  await writeFile(target, "Synthetic authoritative sentinel\n");
+  let h = harness(home);
+  try {
+    const original = await h.call("context_observe", claim, repo, "before-restart", "original");
+    await h.close(); h = harness(home);
+    assert.equal((await h.call("context_read_observation", { observationId: original.observationId }, repo)).results[0].text, claim.text);
+    const replacement = await h.call("context_observe", { ...claim, text: "Use revised transactional writes" }, repo, "after-restart", "replacement");
+    await h.call("context_observation_lifecycle", { observationId: original.observationId, predecessorEventId: original.eventId, action: "supersede", relatedObservationId: replacement.observationId }, repo, "after-restart", "supersede");
+    const read = await h.call("context_read_observation", { observationId: original.observationId, history: true }, repo);
+    assert.equal(read.results[0].state, "superseded");
+    const proposed = await h.call("context_promote", { observationId: replacement.observationId, scope: "repo", target: "AGENTS.md", rationale: "Review only" }, repo);
+    assert.equal(proposed.status, "proposed");
+    assert.equal(await readFile(target, "utf8"), "Synthetic authoritative sentinel\n");
+  } finally { await h.close(); await rm(root, { recursive: true, force: true }); }
+});

@@ -2,6 +2,8 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 import { ContextStore } from "./store.js";
+import { looksLog } from "./log-format.js";
+import { looksDelimited } from "./delimited.js";
 import { ContextOutStore } from "./context-out/store.js";
 
 const MAX_INLINE_BYTES = 8_192;
@@ -40,7 +42,11 @@ export default function registerContextFlow(pi: ExtensionAPI, options: { home?: 
       const captured = await store.captureIntercepted(event.toolName, event.input, raw, "tool_result_envelope");
       const reference = await store.reference(captured.evidence.evidenceId);
       const capture = { evidence: `evidence://${reference.evidenceId}`, type: reference.shape };
-      return { content: [{ type: "text", text: JSON.stringify(capture) }], details: { contextFlow: { captured: true, ...reference, jsonRpc: captured.jsonRpc } } };
+      const sourceDetails = event.details;
+      const objectDetails = sourceDetails !== null && typeof sourceDetails === "object" && !Array.isArray(sourceDetails);
+      const contextFlow = { captured: true, ...reference, jsonRpc: captured.jsonRpc,
+        ...(!objectDetails || Object.hasOwn(sourceDetails, "contextFlow") ? { sourceDetails } : {}) };
+      return { content: [{ type: "text", text: JSON.stringify(capture) }], details: { ...(objectDetails ? sourceDetails : {}), contextFlow } };
     } catch (error) {
       // A tool-result hook must never replace the source result with an extension exception.
       console.error("Context Flow capture failed:", error);
@@ -178,8 +184,8 @@ export function shouldAutoCapture(raw: string): boolean {
   try { JSON.parse(raw); return true; } catch { /* fall through */ }
   const lines = raw.split(/\r?\n/).filter(Boolean);
   const jsonLines = lines.filter((line) => { try { JSON.parse(line); return true; } catch { return false; } }).length;
-  const delimited = lines.length >= 2 && [",", "\t"].some((delimiter) => lines.slice(0, 3).every((line) => line.includes(delimiter)));
+  const delimited = looksDelimited(raw, ",") || looksDelimited(raw, "\t");
   const xml = /^\s*<\?xml(?:\s|\?>)/u.test(raw);
   const yaml = /^(?:---\s*$|[A-Za-z_][\w-]*:\s*(?:[^\n]*)$)/m.test(raw);
-  return jsonLines > 0 || delimited || xml || yaml || /^(?:\d{4}-\d\d-\d\d|\[[^\]]+\])|\b(?:ERROR|WARN|INFO|DEBUG)\b/m.test(raw);
+  return jsonLines > 0 || delimited || xml || yaml || looksLog(raw);
 }
