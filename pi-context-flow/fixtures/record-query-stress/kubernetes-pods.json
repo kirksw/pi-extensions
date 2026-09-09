@@ -1,0 +1,3300 @@
+{
+  "apiVersion": "v1",
+  "kind": "PodList",
+  "items": [
+    {
+      "metadata": {
+        "name": "api-7c9d",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-4b2a",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "False"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-0000",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-1eef",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-3dde",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-5ccd",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-7bbc",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-9aab",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-b99a",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-d889",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-f778",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-1667",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-3556",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-5445",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-7334",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-9223",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-b112",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-d001",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-eef0",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-0ddf",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-2cce",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-4bbd",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-6aac",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-899b",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-a88a",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-c779",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-e668",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-0557",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-2446",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-4335",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-6224",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-8113",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-a002",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-bef1",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-dde0",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-fccf",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-1bbe",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-3aad",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-599c",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-788b",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-977a",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-b669",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-d558",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-f447",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-1336",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-3225",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-5114",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-7003",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-8ef2",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-ade1",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-ccd0",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-ebbf",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-0aae",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-299d",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-488c",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-677b",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-866a",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-a559",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-c448",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-e337",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-0226",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-2115",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-4004",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-5ef3",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-7de2",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-9cd1",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-bbc0",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-daaf",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-f99e",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-188d",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-377c",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-566b",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-755a",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-9449",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-b338",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-d227",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-f116",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-1005",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-2ef4",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-4de3",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-6cd2",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-8bc1",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-aab0",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-c99f",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-e88e",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-077d",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-266c",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-455b",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-644a",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-8339",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-a228",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-c117",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-e006",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-fef5",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-1de4",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-3cd3",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-5bc2",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-7ab1",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-99a0",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-b88f",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-d77e",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-f66d",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-155c",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-344b",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-533a",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-7229",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-9118",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-b007",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-cef6",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-ede5",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-0cd4",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-2bc3",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-4ab2",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-69a1",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-8890",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-a77f",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-c66e",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-e55d",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-044c",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "api-233b",
+        "namespace": "payments",
+        "labels": {
+          "app.kubernetes.io/name": "api",
+          "team": "payments"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "registry.example/api:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-422a",
+        "namespace": "platform",
+        "labels": {
+          "app.kubernetes.io/name": "worker",
+          "team": "platform"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "worker",
+            "image": "registry.example/worker:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "name": "web-6119",
+        "namespace": "mobile",
+        "labels": {
+          "app.kubernetes.io/name": "web",
+          "team": "mobile"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "web",
+            "image": "registry.example/web:42"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Running",
+        "conditions": [
+          {
+            "type": "Ready",
+            "status": "True"
+          }
+        ]
+      }
+    }
+  ]
+}

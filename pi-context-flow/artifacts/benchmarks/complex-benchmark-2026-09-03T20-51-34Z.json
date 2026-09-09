@@ -1,0 +1,410 @@
+[
+  {
+    "scenario": "github",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 6159,
+    "usage": {
+      "input": 14515,
+      "output": 118,
+      "toolResult": 49311,
+      "cost": 0
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "- #104 — Fix retry backoff — author: ada — state: open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 4,
+    "elapsedMs": 22796,
+    "usage": {
+      "input": 11645,
+      "output": 708,
+      "toolResult": 2527,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file",
+      "ctx_execute_file",
+      "ctx_execute_file"
+    ],
+    "answer": "#104 — Fix retry backoff — ada — open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 5192,
+    "usage": {
+      "input": 16752,
+      "output": 66,
+      "toolResult": 49311,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_github"
+    ],
+    "answer": "Open pull requests for `octo-org/widget-api`, most recently updated first:\n\n- #104 — Fix retry backoff — author: `ada` — state: open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 6961,
+    "usage": {
+      "input": 14611,
+      "output": 72,
+      "toolResult": 49311,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_github"
+    ],
+    "answer": "Open pull requests for `octo-org/widget-api`, most recently updated first:\n\n- #104 — Fix retry backoff — author: `ada` — state: open"
+  },
+  {
+    "scenario": "github",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 8246,
+    "usage": {
+      "input": 2615,
+      "output": 155,
+      "toolResult": 390,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_github",
+      "context_query_records"
+    ],
+    "answer": "Open pull requests, most recently updated first:\n\n- #104 — Fix retry backoff — author: ada — state: open"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 2,
+    "elapsedMs": 41402,
+    "usage": {
+      "input": 11791,
+      "output": 2052,
+      "toolResult": 40423,
+      "cost": 0
+    },
+    "tools": [
+      "read"
+    ],
+    "answer": "Messages in chronological order:\n\n1. U-ADA: Investigating the payment timeout\n2. B-DEPLOY: Deploy finished — thread reply to message 1 (`thread_ts: 1773133200.000100`)\n3. U-LIN: Standup notes 1\n4. U-BEA: On-call handoff summary 2\n5. U-LIN: Invoice sync report 3\n6. U-BEA: Capacity planning update 4\n7. U-LIN: Release checklist item 5\n8. U-BEA: Standup notes 6\n9. U-LIN: On-call handoff summary 7\n10. U-BEA: Invoice sync report 8\n11. U-LIN: Capacity planning update 9\n12. U-BEA: Release checklist item 10\n13. U-LIN: Standup notes 11\n14. U-BEA: On-call handoff summary 12\n15. U-LIN: Invoice sync report 13\n16. U-BEA: Capacity planning update 14\n17. U-LIN: Release checklist item 15\n18. U-BEA: Standup notes 16\n19. U-LIN: On-call handoff summary 17\n20. U-BEA: Invoice sync report 18\n21. U-LIN: Capacity planning update 19\n22. U-BEA: Release checklist item 20\n23. U-LIN: Standup notes 21\n24. U-BEA: On-call handoff summary 22\n25. U-LIN: Invoice sync report 23\n26. U-BEA: Capacity planning update 24\n27. U-LIN: Release checklist item 25\n28. U-BEA: Standup notes 26\n29. U-LIN: On-call handoff summary 27\n30. U-BEA: Invoice sync report 28\n31. U-LIN: Capacity planning update 29\n32. U-BEA: Release checklist item 30\n33. U-LIN: Standup notes 31\n34. U-BEA: On-call handoff summary 32\n35. U-LIN: Invoice sync report 33\n36. U-BEA: Capacity planning update 34\n37. U-LIN: Release checklist item 35\n38. U-BEA: Standup notes 36\n39. U-LIN: On-call handoff summary 37\n40. U-BEA: Invoice sync report 38\n41. U-LIN: Capacity planning update 39\n42. U-BEA: Release checklist item 40\n43. U-LIN: Standup notes 41\n44. U-BEA: On-call handoff summary 42\n45. U-LIN: Invoice sync report 43\n46. U-BEA: Capacity planning update 44\n47. U-LIN: Release checklist item 45\n48. U-BEA: Standup notes 46\n49. U-LIN: On-call handoff summary 47\n50. U-BEA: Invoice sync report 48\n51. U-LIN: Capacity planning update 49\n52. U-BEA: Release checklist item 50\n53. U-LIN: Standup notes 51\n54. U-BEA: On-call handoff summary 52\n55. U-LIN: Invoice sync report 53\n56. U-BEA: Capacity planning update 54\n57. U-LIN: Release checklist item 55\n58. U-BEA: Standup notes 56\n59. U-LIN: On-call handoff summary 57\n60. U-BEA: Invoice sync report 58\n61. U-LIN: Capacity planning update 59\n62. U-BEA: Release checklist item 60\n63. U-LIN: Standup notes 61\n64. U-BEA: On-call handoff summary 62\n65. U-LIN: Invoice sync report 63\n66. U-BEA: Capacity planning update 64\n67. U-LIN: Release checklist item 65\n68. U-BEA: Standup notes 66\n69. U-LIN: On-call handoff summary 67\n70. U-BEA: Invoice sync report 68\n71. U-LIN: Capacity planning update 69\n72. U-BEA: Release checklist item 70\n73. U-LIN: Standup notes 71\n74. U-BEA: On-call handoff summary 72\n75. U-LIN: Invoice sync report 73\n76. U-BEA: Capacity planning update 74\n77. U-LIN: Release checklist item 75\n78. U-BEA: Standup notes 76\n79. U-LIN: On-call handoff summary 77\n80. U-BEA: Invoice sync report 78\n81. U-LIN: Capacity planning update 79\n82. U-BEA: Release checklist item 80\n83. U-LIN: Standup notes 81\n84. U-BEA: On-call handoff summary 82\n85. U-LIN: Invoice sync report 83\n86. U-BEA: Capacity planning update 84\n87. U-LIN: Release checklist item 85\n88. U-BEA: Standup notes 86\n89. U-LIN: On-call handoff summary 87\n90. U-BEA: Invoice sync report 88\n91. U-LIN: Capacity planning update 89\n92. U-BEA: Release checklist item 90\n93. U-LIN: Standup notes 91\n94. U-BEA: On-call handoff summary 92\n95. U-LIN: Invoice sync report 93\n96. U-BEA: Capacity planning update 94\n97. U-LIN: Release checklist item 95\n98. U-BEA: Standup notes 96\n99. U-LIN: On-call handoff summary 97\n100. U-BEA: Invoice sync report 98\n101. U-LIN: Capacity planning update 99\n102. U-BEA: Release checklist item 100\n103. U-LIN: Standup notes 101\n104. U-BEA: On-call handoff summary 102\n105. U-LIN: Invoice sync report 103\n106. U-BEA: Capacity planning update 104\n107. U-LIN: Release checklist item 105\n108. U-BEA: Standup notes 106\n109. U-LIN: On-call handoff summary 107\n110. U-BEA: Invoice sync report 108\n111. U-LIN: Capacity planning update 109\n112. U-BEA: Release checklist item 110\n113. U-LIN: Standup notes 111\n114. U-BEA: On-call handoff summary 112\n115. U-LIN: Invoice sync report 113\n116. U-BEA: Capacity planning update 114\n117. U-LIN: Release checklist item 115\n118. U-BEA: Standup notes 116\n119. U-LIN: On-call handoff summary 117\n120. U-BEA: Invoice sync report 118\n121. U-LIN: Capacity planning update 119\n122. U-BEA: Release checklist item 120\n123. U-LIN: Standup notes 121\n124. U-BEA: On-call handoff summary 122\n125. U-LIN: Invoice sync report 123\n126. U-BEA: Capacity planning update 124\n127. U-LIN: Release checklist item 125\n128. U-BEA: Standup notes 126\n129. U-LIN: On-call handoff summary 127\n130. U-BEA: Invoice sync report 128\n131. U-LIN: Capacity planning update 129\n132. U-BEA: Release checklist item 130\n133. U-LIN: Standup notes 131\n134. U-BEA: On-call handoff summary 132\n135. U-LIN: Invoice sync report 133\n136. U-BEA: Capacity planning update 134\n137. U-LIN: Release checklist item 135\n138. U-BEA: Standup notes 136\n139. U-LIN: On-call handoff summary 137\n140. U-BEA: Invoice sync report 138\n141. U-LIN: Capacity planning update 139\n142. U-BEA: Release checklist item 140\n143. U-LIN: Standup notes 141\n144. U-BEA: On-call handoff summary 142\n145. U-LIN: Invoice sync report 143\n146. U-BEA: Capacity planning update 144\n147. U-LIN: Release checklist item 145\n148. U-BEA: Standup notes 146\n149. U-LIN: On-call handoff summary 147\n150. U-BEA: Invoice sync report 148\n151. U-LIN: Capacity planning update 149\n152. U-BEA: Release checklist item 150\n\nOnly `B-DEPLOY: Deploy finished` belongs to a thread; it replies to `U-ADA: Investigating the payment timeout`."
+  },
+  {
+    "scenario": "slack",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 50160,
+    "usage": {
+      "input": 4804,
+      "output": 2568,
+      "toolResult": 10569,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "1. U-ADA — Investigating the payment timeout\n2. B-DEPLOY — Deploy finished — thread reply to message 1\n3. U-LIN — Standup notes 1\n4. U-BEA — On-call handoff summary 2\n5. U-LIN — Invoice sync report 3\n6. U-BEA — Capacity planning update 4\n7. U-LIN — Release checklist item 5\n8. U-BEA — Standup notes 6\n9. U-LIN — On-call handoff summary 7\n10. U-BEA — Invoice sync report 8\n11. U-LIN — Capacity planning update 9\n12. U-BEA — Release checklist item 10\n13. U-LIN — Standup notes 11\n14. U-BEA — On-call handoff summary 12\n15. U-LIN — Invoice sync report 13\n16. U-BEA — Capacity planning update 14\n17. U-LIN — Release checklist item 15\n18. U-BEA — Standup notes 16\n19. U-LIN — On-call handoff summary 17\n20. U-BEA — Invoice sync report 18\n21. U-LIN — Capacity planning update 19\n22. U-BEA — Release checklist item 20\n23. U-LIN — Standup notes 21\n24. U-BEA — On-call handoff summary 22\n25. U-LIN — Invoice sync report 23\n26. U-BEA — Capacity planning update 24\n27. U-LIN — Release checklist item 25\n28. U-BEA — Standup notes 26\n29. U-LIN — On-call handoff summary 27\n30. U-BEA — Invoice sync report 28\n31. U-LIN — Capacity planning update 29\n32. U-BEA — Release checklist item 30\n33. U-LIN — Standup notes 31\n34. U-BEA — On-call handoff summary 32\n35. U-LIN — Invoice sync report 33\n36. U-BEA — Capacity planning update 34\n37. U-LIN — Release checklist item 35\n38. U-BEA — Standup notes 36\n39. U-LIN — On-call handoff summary 37\n40. U-BEA — Invoice sync report 38\n41. U-LIN — Capacity planning update 39\n42. U-BEA — Release checklist item 40\n43. U-LIN — Standup notes 41\n44. U-BEA — On-call handoff summary 42\n45. U-LIN — Invoice sync report 43\n46. U-BEA — Capacity planning update 44\n47. U-LIN — Release checklist item 45\n48. U-BEA — Standup notes 46\n49. U-LIN — On-call handoff summary 47\n50. U-BEA — Invoice sync report 48\n51. U-LIN — Capacity planning update 49\n52. U-BEA — Release checklist item 50\n53. U-LIN — Standup notes 51\n54. U-BEA — On-call handoff summary 52\n55. U-LIN — Invoice sync report 53\n56. U-BEA — Capacity planning update 54\n57. U-LIN — Release checklist item 55\n58. U-BEA — Standup notes 56\n59. U-LIN — On-call handoff summary 57\n60. U-BEA — Invoice sync report 58\n61. U-LIN — Capacity planning update 59\n62. U-BEA — Release checklist item 60\n63. U-LIN — Standup notes 61\n64. U-BEA — On-call handoff summary 62\n65. U-LIN — Invoice sync report 63\n66. U-BEA — Capacity planning update 64\n67. U-LIN — Release checklist item 65\n68. U-BEA — Standup notes 66\n69. U-LIN — On-call handoff summary 67\n70. U-BEA — Invoice sync report 68\n71. U-LIN — Capacity planning update 69\n72. U-BEA — Release checklist item 70\n73. U-LIN — Standup notes 71\n74. U-BEA — On-call handoff summary 72\n75. U-LIN — Invoice sync report 73\n76. U-BEA — Capacity planning update 74\n77. U-LIN — Release checklist item 75\n78. U-BEA — Standup notes 76\n79. U-LIN — On-call handoff summary 77\n80. U-BEA — Invoice sync report 78\n81. U-LIN — Capacity planning update 79\n82. U-BEA — Release checklist item 80\n83. U-LIN — Standup notes 81\n84. U-BEA — On-call handoff summary 82\n85. U-LIN — Invoice sync report 83\n86. U-BEA — Capacity planning update 84\n87. U-LIN — Release checklist item 85\n88. U-BEA — Standup notes 86\n89. U-LIN — On-call handoff summary 87\n90. U-BEA — Invoice sync report 88\n91. U-LIN — Capacity planning update 89\n92. U-BEA — Release checklist item 90\n93. U-LIN — Standup notes 91\n94. U-BEA — On-call handoff summary 92\n95. U-LIN — Invoice sync report 93\n96. U-BEA — Capacity planning update 94\n97. U-LIN — Release checklist item 95\n98. U-BEA — Standup notes 96\n99. U-LIN — On-call handoff summary 97\n100. U-BEA — Invoice sync report 98\n101. U-LIN — Capacity planning update 99\n102. U-BEA — Release checklist item 100\n103. U-LIN — Standup notes 101\n104. U-BEA — On-call handoff summary 102\n105. U-LIN — Invoice sync report 103\n106. U-BEA — Capacity planning update 104\n107. U-LIN — Release checklist item 105\n108. U-BEA — Standup notes 106\n109. U-LIN — On-call handoff summary 107\n110. U-BEA — Invoice sync report 108\n111. U-LIN — Capacity planning update 109\n112. U-BEA — Release checklist item 110\n113. U-LIN — Standup notes 111\n114. U-BEA — On-call handoff summary 112\n115. U-LIN — Invoice sync report 113\n116. U-BEA — Capacity planning update 114\n117. U-LIN — Release checklist item 115\n118. U-BEA — Standup notes 116\n119. U-LIN — On-call handoff summary 117\n120. U-BEA — Invoice sync report 118\n121. U-LIN — Capacity planning update 119\n122. U-BEA — Release checklist item 120\n123. U-LIN — Standup notes 121\n124. U-BEA — On-call handoff summary 122\n125. U-LIN — Invoice sync report 123\n126. U-BEA — Capacity planning update 124\n127. U-LIN — Release checklist item 125\n128. U-BEA — Standup notes 126\n129. U-LIN — On-call handoff summary 127\n130. U-BEA — Invoice sync report 128\n131. U-LIN — Capacity planning update 129\n132. U-BEA — Release checklist item 130\n133. U-LIN — Standup notes 131\n134. U-BEA — On-call handoff summary 132\n135. U-LIN — Invoice sync report 133\n136. U-BEA — Capacity planning update 134\n137. U-LIN — Release checklist item 135\n138. U-BEA — Standup notes 136\n139. U-LIN — On-call handoff summary 137\n140. U-BEA — Invoice sync report 138\n141. U-LIN — Capacity planning update 139\n142. U-BEA — Release checklist item 140\n143. U-LIN — Standup notes 141\n144. U-BEA — On-call handoff summary 142\n145. U-LIN — Invoice sync report 143\n146. U-BEA — Capacity planning update 144\n147. U-LIN — Release checklist item 145\n148. U-BEA — Standup notes 146\n149. U-LIN — On-call handoff summary 147\n150. U-BEA — Invoice sync report 148\n151. U-LIN — Capacity planning update 149\n152. U-BEA — Release checklist item 150\n\nOnly message 2 belongs to a thread: it replies to message 1, “Investigating the payment timeout.”"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 11690,
+    "usage": {
+      "input": 12494,
+      "output": 465,
+      "toolResult": 40423,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_slack"
+    ],
+    "answer": "Chronological channel messages:\n\n1. U-ADA: “Investigating the payment timeout”\n2. B-DEPLOY: “Deploy finished” — thread reply to message 1\n3. U-LIN: “Standup notes 1”\n4. U-BEA: “On-call handoff summary 2”\n5. U-LIN: “Invoice sync report 3”\n6. U-BEA: “Capacity planning update 4”\n7. U-LIN: “Release checklist item 5”\n\nMessages 8-150 continue chronologically in this repeating five-message sequence, with the number matching its message text:\n\n- U-BEA: “Standup notes N”\n- U-LIN: “On-call handoff summary N”\n- U-BEA: “Invoice sync report N”\n- U-LIN: “Capacity planning update N”\n- U-BEA: “Release checklist item N”\n\nThus, the final messages are:\n\n146. U-BEA: “Standup notes 146”\n147. U-LIN: “On-call handoff summary 147”\n148. U-BEA: “Invoice sync report 148”\n149. U-LIN: “Capacity planning update 149”\n150. U-BEA: “Release checklist item 150”\n\nOnly “Deploy finished” from B-DEPLOY belongs to a thread; it replies to U-ADA’s “Investigating the payment timeout.”"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 41614,
+    "usage": {
+      "input": 11893,
+      "output": 2064,
+      "toolResult": 40423,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_slack"
+    ],
+    "answer": "1. U-ADA: Investigating the payment timeout\n2. B-DEPLOY: Deploy finished — thread reply to message 1\n3. U-LIN: Standup notes 1\n4. U-BEA: On-call handoff summary 2\n5. U-LIN: Invoice sync report 3\n6. U-BEA: Capacity planning update 4\n7. U-LIN: Release checklist item 5\n8. U-BEA: Standup notes 6\n9. U-LIN: On-call handoff summary 7\n10. U-BEA: Invoice sync report 8\n11. U-LIN: Capacity planning update 9\n12. U-BEA: Release checklist item 10\n13. U-LIN: Standup notes 11\n14. U-BEA: On-call handoff summary 12\n15. U-LIN: Invoice sync report 13\n16. U-BEA: Capacity planning update 14\n17. U-LIN: Release checklist item 15\n18. U-BEA: Standup notes 16\n19. U-LIN: On-call handoff summary 17\n20. U-BEA: Invoice sync report 18\n21. U-LIN: Capacity planning update 19\n22. U-BEA: Release checklist item 20\n23. U-LIN: Standup notes 21\n24. U-BEA: On-call handoff summary 22\n25. U-LIN: Invoice sync report 23\n26. U-BEA: Capacity planning update 24\n27. U-LIN: Release checklist item 25\n28. U-BEA: Standup notes 26\n29. U-LIN: On-call handoff summary 27\n30. U-BEA: Invoice sync report 28\n31. U-LIN: Capacity planning update 29\n32. U-BEA: Release checklist item 30\n33. U-LIN: Standup notes 31\n34. U-BEA: On-call handoff summary 32\n35. U-LIN: Invoice sync report 33\n36. U-BEA: Capacity planning update 34\n37. U-LIN: Release checklist item 35\n38. U-BEA: Standup notes 36\n39. U-LIN: On-call handoff summary 37\n40. U-BEA: Invoice sync report 38\n41. U-LIN: Capacity planning update 39\n42. U-BEA: Release checklist item 40\n43. U-LIN: Standup notes 41\n44. U-BEA: On-call handoff summary 42\n45. U-LIN: Invoice sync report 43\n46. U-BEA: Capacity planning update 44\n47. U-LIN: Release checklist item 45\n48. U-BEA: Standup notes 46\n49. U-LIN: On-call handoff summary 47\n50. U-BEA: Invoice sync report 48\n51. U-LIN: Capacity planning update 49\n52. U-BEA: Release checklist item 50\n53. U-LIN: Standup notes 51\n54. U-BEA: On-call handoff summary 52\n55. U-LIN: Invoice sync report 53\n56. U-BEA: Capacity planning update 54\n57. U-LIN: Release checklist item 55\n58. U-BEA: Standup notes 56\n59. U-LIN: On-call handoff summary 57\n60. U-BEA: Invoice sync report 58\n61. U-LIN: Capacity planning update 59\n62. U-BEA: Release checklist item 60\n63. U-LIN: Standup notes 61\n64. U-BEA: On-call handoff summary 62\n65. U-LIN: Invoice sync report 63\n66. U-BEA: Capacity planning update 64\n67. U-LIN: Release checklist item 65\n68. U-BEA: Standup notes 66\n69. U-LIN: On-call handoff summary 67\n70. U-BEA: Invoice sync report 68\n71. U-LIN: Capacity planning update 69\n72. U-BEA: Release checklist item 70\n73. U-LIN: Standup notes 71\n74. U-BEA: On-call handoff summary 72\n75. U-LIN: Invoice sync report 73\n76. U-BEA: Capacity planning update 74\n77. U-LIN: Release checklist item 75\n78. U-BEA: Standup notes 76\n79. U-LIN: On-call handoff summary 77\n80. U-BEA: Invoice sync report 78\n81. U-LIN: Capacity planning update 79\n82. U-BEA: Release checklist item 80\n83. U-LIN: Standup notes 81\n84. U-BEA: On-call handoff summary 82\n85. U-LIN: Invoice sync report 83\n86. U-BEA: Capacity planning update 84\n87. U-LIN: Release checklist item 85\n88. U-BEA: Standup notes 86\n89. U-LIN: On-call handoff summary 87\n90. U-BEA: Invoice sync report 88\n91. U-LIN: Capacity planning update 89\n92. U-BEA: Release checklist item 90\n93. U-LIN: Standup notes 91\n94. U-BEA: On-call handoff summary 92\n95. U-LIN: Invoice sync report 93\n96. U-BEA: Capacity planning update 94\n97. U-LIN: Release checklist item 95\n98. U-BEA: Standup notes 96\n99. U-LIN: On-call handoff summary 97\n100. U-BEA: Invoice sync report 98\n101. U-LIN: Capacity planning update 99\n102. U-BEA: Release checklist item 100\n103. U-LIN: Standup notes 101\n104. U-BEA: On-call handoff summary 102\n105. U-LIN: Invoice sync report 103\n106. U-BEA: Capacity planning update 104\n107. U-LIN: Release checklist item 105\n108. U-BEA: Standup notes 106\n109. U-LIN: On-call handoff summary 107\n110. U-BEA: Invoice sync report 108\n111. U-LIN: Capacity planning update 109\n112. U-BEA: Release checklist item 110\n113. U-LIN: Standup notes 111\n114. U-BEA: On-call handoff summary 112\n115. U-LIN: Invoice sync report 113\n116. U-BEA: Capacity planning update 114\n117. U-LIN: Release checklist item 115\n118. U-BEA: Standup notes 116\n119. U-LIN: On-call handoff summary 117\n120. U-BEA: Invoice sync report 118\n121. U-LIN: Capacity planning update 119\n122. U-BEA: Release checklist item 120\n123. U-LIN: Standup notes 121\n124. U-BEA: On-call handoff summary 122\n125. U-LIN: Invoice sync report 123\n126. U-BEA: Capacity planning update 124\n127. U-LIN: Release checklist item 125\n128. U-BEA: Standup notes 126\n129. U-LIN: On-call handoff summary 127\n130. U-BEA: Invoice sync report 128\n131. U-LIN: Capacity planning update 129\n132. U-BEA: Release checklist item 130\n133. U-LIN: Standup notes 131\n134. U-BEA: On-call handoff summary 132\n135. U-LIN: Invoice sync report 133\n136. U-BEA: Capacity planning update 134\n137. U-LIN: Release checklist item 135\n138. U-BEA: Standup notes 136\n139. U-LIN: On-call handoff summary 137\n140. U-BEA: Invoice sync report 138\n141. U-LIN: Capacity planning update 139\n142. U-BEA: Release checklist item 140\n143. U-LIN: Standup notes 141\n144. U-BEA: On-call handoff summary 142\n145. U-LIN: Invoice sync report 143\n146. U-BEA: Capacity planning update 144\n147. U-LIN: Release checklist item 145\n148. U-BEA: Standup notes 146\n149. U-LIN: On-call handoff summary 147\n150. U-BEA: Invoice sync report 148\n151. U-LIN: Capacity planning update 149\n152. U-BEA: Release checklist item 150\n\nOnly message 2 belongs to a thread; it replies to message 1, “Investigating the payment timeout.”"
+  },
+  {
+    "scenario": "slack",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 11034,
+    "usage": {
+      "input": 2974,
+      "output": 255,
+      "toolResult": 1748,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_slack",
+      "context_query_records"
+    ],
+    "answer": "- U-ADA: Investigating the payment timeout\n- B-DEPLOY: Deploy finished — belongs to the thread started at `1773133200.000100`\n- U-LIN: Standup notes 1\n- U-BEA: On-call handoff summary 2\n- U-LIN: Invoice sync report 3\n- U-BEA: Capacity planning update 4\n- U-LIN: Release checklist item 5\n- U-BEA: Standup notes 6\n- U-LIN: On-call handoff summary 7\n- U-BEA: Invoice sync report 8"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 3,
+    "elapsedMs": 7281,
+    "usage": {
+      "input": 27092,
+      "output": 119,
+      "toolResult": 74582,
+      "cost": 0
+    },
+    "tools": [
+      "read",
+      "read"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 7743,
+    "usage": {
+      "input": 974,
+      "output": 228,
+      "toolResult": 641,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 4291,
+    "usage": {
+      "input": 17576,
+      "output": 42,
+      "toolResult": 74493,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_kubernetes"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 6042,
+    "usage": {
+      "input": 16975,
+      "output": 58,
+      "toolResult": 74493,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_kubernetes"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "kubernetes",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 9158,
+    "usage": {
+      "input": 2551,
+      "output": 149,
+      "toolResult": 338,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_kubernetes",
+      "context_query_records"
+    ],
+    "answer": "- `worker-4b2a` — namespace: `payments` — phase: `Pending`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "file-reference",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "read",
+    "turns": 3,
+    "elapsedMs": 7150,
+    "usage": {
+      "input": 18074,
+      "output": 130,
+      "toolResult": 80712,
+      "cost": 0
+    },
+    "tools": [
+      "read",
+      "read"
+    ],
+    "answer": "`r-001`\n`r-002`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "file-reference",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "ctx_execute_file",
+    "turns": 2,
+    "elapsedMs": 11204,
+    "usage": {
+      "input": 893,
+      "output": 194,
+      "toolResult": 533,
+      "cost": 0
+    },
+    "tools": [
+      "ctx_execute_file"
+    ],
+    "answer": "- `r-001`\n- `r-002`"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "raw",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 4325,
+    "usage": {
+      "input": 17997,
+      "output": 41,
+      "toolResult": 80623,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_aws"
+    ],
+    "answer": "r-001\nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "context-mode",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "inline tool result (control)",
+    "turns": 2,
+    "elapsedMs": 6229,
+    "usage": {
+      "input": 17396,
+      "output": 48,
+      "toolResult": 80623,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_aws"
+    ],
+    "answer": "r-001\nr-002"
+  },
+  {
+    "scenario": "aws",
+    "protocol": "mcp-payload",
+    "configuration": "context-flow",
+    "valid": true,
+    "correctness": "pass",
+    "mechanism": "tool-result interception + Context Flow query",
+    "turns": 3,
+    "elapsedMs": 8124,
+    "usage": {
+      "input": 3479,
+      "output": 114,
+      "toolResult": 300,
+      "cost": 0
+    },
+    "tools": [
+      "benchmark_emit_aws",
+      "context_query_records"
+    ],
+    "answer": "- `r-001`\n- `r-002`"
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "incident": {
+    "requestId": "req-incident-001",
+    "route": "/v1/invoices",
+    "version": "2026.02.18.1",
+    "bug": "tenant_id serialization regression causes InvoiceSerializer.toWire to read an undefined currency; fallback returns an empty invoice list with HTTP 200",
+    "firstFailure": "2026-02-18T09:14:03.241Z"
+  },
+  "linear": {
+    "team": "payments",
+    "oldestOpen": [
+      "PAY-104",
+      "PAY-107",
+      "PAY-112"
+    ],
+    "excluded": [
+      "PAY-099",
+      "PLA-001"
+    ]
+  },
+  "revenue": {
+    "rules": "paid invoices only; subtotal excluding tax; subtract succeeded refunds; deduplicate payment retries; convert EUR at 1.1",
+    "targetAdjustmentsUsd": {
+      "paidSubtotal": 15500,
+      "succeededRefunds": 1200,
+      "net": 14300
+    }
+  }
+}
