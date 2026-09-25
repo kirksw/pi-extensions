@@ -345,3 +345,19 @@ test("interception capture envelope preserves chunk boundaries without synthetic
   const circular: { self?: unknown } = {}; circular.self = circular;
   assert.equal(serializeToolContent(circular), undefined, "unsupported payloads bypass interception rather than being altered");
 });
+
+test("URI SQL and jq overflow retain canonical dependency IDs", async () => {
+  const store = await makeStore();
+  const evidence = await store.capture("fixture", {}, { value: "x".repeat(70000) });
+  const uri = `evidence://${evidence.evidenceId}`;
+  const sql = await store.querySql(uri, "SELECT value FROM evidence");
+  assert.equal(sql.truncated, true);
+  assert.equal(sql.query.evidenceId, evidence.evidenceId);
+  assert.deepEqual((await store.evidenceMetadata(sql.outputEvidence!.evidenceId)).dependencies, [uri]);
+  if (process.env.PATH?.split(delimiter).some(p => existsSync(join(p, "jq")))) {
+    const jq = await store.queryJq(uri, ".value");
+    assert.equal(jq.truncated, true);
+    assert.equal(jq.query.evidenceId, evidence.evidenceId);
+    assert.deepEqual((await store.evidenceMetadata(jq.outputEvidence!.evidenceId)).dependencies, [uri]);
+  }
+});

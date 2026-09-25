@@ -77,7 +77,7 @@ export class ContextOutStore {
     const request = { observationId: bare(input.observationId), scope: input.scope, target: input.target, rationale: input.rationale };
     return this.serialized(() => this.commit(cwd, sessionId, key, { operation: "promote", ...request }, async identity => {
       if (!["repo", "architecture", "organization"].includes(request.scope) || !request.target.trim() || Buffer.byteLength(request.target) > 4096 || Buffer.byteLength(request.rationale) > 16384) throw new Error("Invalid candidate proposal");
-      const observation = (await (await this.projection(identity)).read(request.observationId)).results[0];
+      const observation = await (await this.projection(identity)).lookup(request.observationId);
       if (!observation || observation.state !== "active") throw new Error("Candidate requires an active observation owned by this worktree");
       return { type: "candidate.proposed", subjectId: `candidate_${randomUUID()}`, idempotencyKey: key, metadata: observation.metadata, payload: request };
     }));
@@ -87,11 +87,11 @@ export class ContextOutStore {
       relatedObservationId: input.relatedObservationId ? bare(input.relatedObservationId) : null, reason: input.reason ?? null };
     return this.serialized(() => this.commit(cwd, sessionId, key, { operation: "lifecycle", ...request }, async identity => {
       const projection = await this.projection(identity);
-      const observation = (await projection.read(request.observationId)).results[0];
+      const observation = await projection.lookup(request.observationId);
       if (!observation || observation.state !== "active" || observation.headEventId !== request.predecessorEventId) throw new Error("Lifecycle requires an active owned observation and its current predecessor event");
       if (!["retract", "supersede", "link_support"].includes(request.action) || (request.reason && Buffer.byteLength(request.reason) > 16384)) throw new Error("Invalid lifecycle request");
       if (request.action !== "retract") {
-        const related = request.relatedObservationId && (await projection.read(request.relatedObservationId)).results[0];
+        const related = request.relatedObservationId && await projection.lookup(request.relatedObservationId);
         if (!related || related.observationId === observation.observationId || related.state !== "active") throw new Error("Support/replacement requires a different active observation owned by this worktree");
       }
       const payload = { predecessorEventId: request.predecessorEventId, ...(request.action === "retract" ? { reason: request.reason ?? "" }
@@ -110,8 +110,9 @@ export class ContextOutStore {
     return this.serialized(async () => {
       const identity = await resolveContextOutIdentity(cwd, this.options), projection = await this.projection(identity);
       const page = await projection.read(observationId, { scope: input.scope, responseBytes: 24000 });
-      const observation = page.results[0];
-      if (!observation || !input.assess) return page;
+      if (!input.assess) return page;
+      const observation = await projection.lookup(observationId, input.scope);
+      if (!observation) return page;
       const event = (await replayContextOutEvents(identity)).records.find(r => r.event.eventId === observation.creationEventId)!.event;
       const payload = event.payload as unknown as { provenance: { evidence: EvidenceSnapshot[] } };
       const assessments = await assessEvidence(identity, observation.origin, payload.provenance.evidence);
@@ -120,13 +121,15 @@ export class ContextOutStore {
     });
   }
   /** Byte-paged immutable snapshots/history allow inspecting a single large event without a giant row. */
-  inspect(cwd: string, observationId: string, input: { scope?: "worktree" | "repository"; section: "provenance" | "history"; offset?: number }) {
+  inspect(cwd: string, observationId: string, input: { scope?: "worktree" | "repository"; section: "provenance" | "history" | "content"; offset?: number }) {
     return this.serialized(async () => {
       const identity = await resolveContextOutIdentity(cwd, this.options), projection = await this.projection(identity);
       const page = await projection.read(observationId, { scope: input.scope });
-      const observation = page.results[0]; if (!observation) throw new Error("Observation not found in selected scope");
-      const events = (await replayContextOutEvents(identity)).records.map(r => r.event).filter(e => e.subjectId === observation.observationId).sort((a, b) => a.eventId.localeCompare(b.eventId));
-      const value = input.section === "provenance" ? (events.find(e => e.eventId === observation.creationEventId)!.payload as Record<string, JsonValue>).provenance
+      const observation = await projection.lookup(observationId, input.scope); if (!observation) throw new Error("Observation not found in selected scope");
+      const allEvents = (await replayContextOutEvents(identity)).records.map(r => r.event);
+      const events = allEvents.filter(e => e.subjectId === observation.observationId).sort((a, b) => a.eventId.localeCompare(b.eventId));
+      const value = input.section === "content" ? { observation, candidates: allEvents.filter(e => e.type === "candidate.proposed" && e.origin.cloneId === observation.origin.cloneId && e.origin.worktreeId === observation.origin.worktreeId && (e.payload as Record<string, JsonValue>).observationId === observation.observationId).map(e => { const p = e.payload as Record<string, JsonValue>; return { candidateId: e.subjectId, observationId: p.observationId, scope: p.scope, target: p.target, rationale: p.rationale }; }) }
+        : input.section === "provenance" ? (events.find(e => e.eventId === observation.creationEventId)!.payload as Record<string, JsonValue>).provenance
         : events.map(({ payload, ...event }) => ({ ...event, payload: event.type === "observation.created" ? { snapshot: "Use provenance section" } : payload }));
       const serialized = JSON.stringify(value), offset = input.offset ?? 0;
       if (!Number.isInteger(offset) || offset < 0 || offset > serialized.length) throw new Error("Invalid character offset");

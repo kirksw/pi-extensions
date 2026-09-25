@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, mkdtemp, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
 import { createWriteStream, existsSync } from "node:fs";
 import { delimiter, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { execFile as execFileCallback, spawn } from "node:child_process";
@@ -10,6 +10,7 @@ import { XMLParser, XMLValidator } from "fast-xml-parser";
 import { parseDocument } from "yaml";
 import { storeDatabase } from "./store-database.js";
 import { analyzeSql } from "./sql-analysis.js";
+import { looksYaml } from "./yaml-format.js";
 import { looksLog } from "./log-format.js";
 import { looksDelimited as looksAutoDelimited } from "./delimited.js";
 import { createId, timestamp } from "./ids.js";
@@ -196,7 +197,7 @@ export class ContextStore {
       const row = (await this.all("SELECT * FROM evidence_queries WHERE query_id = ?", [queryId]))[0];
       if (!row) throw new Error(`Unknown query ID: ${queryId}`);
       const outputEvidenceId = row.output_evidence_id == null ? null : String(row.output_evidence_id);
-      queries.push({ queryId, evidenceId: String(row.evidence_id), language: String(row.language) as QueryRecord["language"], query: String(row.query_text), timestamp: String(row.timestamp), outputEvidenceId });
+      queries.push({ queryId, evidenceId: normalizeEvidenceId(String(row.evidence_id)), language: String(row.language) as QueryRecord["language"], query: String(row.query_text), timestamp: String(row.timestamp), outputEvidenceId });
       pending.push(String(row.evidence_id));
       if (outputEvidenceId) pending.push(outputEvidenceId);
     }
@@ -341,11 +342,11 @@ export class ContextStore {
     const metadata = await this.metadata(normalizeEvidenceId(evidenceId));
     if (!isStructuredShape(metadata.shape) && metadata.shape !== "mixed") throw new Error("SQL is available only for structured or derived mixed evidence.");
     const normalizedSql = normalizeSql(sql); validateSql(normalizedSql);
-    const query = this.queryRecord(evidenceId, "sql", normalizedSql);
+    const query = this.queryRecord(metadata.evidenceId, "sql", normalizedSql);
     await writeFile(join(this.queryDirectory, `${query.queryId}.sql`), normalizedSql + "\n");
     const rows = jsonSafe(await queryEvidenceInMemory(metadata, normalizedSql)) as unknown[];
     const result = bounded(rows.slice(0, MAX_ROWS), MAX_QUERY_BYTES);
-    const outputEvidence = result.truncated || rows.length > MAX_ROWS ? await this.captureDerived(evidenceId, query.queryId, "sql_output", stringify({ rows, truncated: true, scope: "retained SQL preview, not the complete query result" }), "sql output") : undefined;
+    const outputEvidence = result.truncated || rows.length > MAX_ROWS ? await this.captureDerived(metadata.evidenceId, query.queryId, "sql_output", stringify({ rows, truncated: true, scope: "retained SQL preview, not the complete query result" }), "sql output") : undefined;
     await this.recordQuery(query, outputEvidence?.evidenceId);
     const returnedRows = (result.truncated ? [result.value] : result.value) as unknown[];
     const compact = format === "json" ? (returnedRows.length === 1 && returnedRows[0] && typeof returnedRows[0] === "object" ? compactJsonResult(returnedRows[0] as Record<string, unknown>) : returnedRows) : undefined;
@@ -415,7 +416,7 @@ export class ContextStore {
   async queryJq(evidenceId: string, expression: string): Promise<{ query: QueryRecord; result: unknown; outputEvidence?: EvidenceReference; truncated: boolean }> {
     const metadata = await this.metadata(normalizeEvidenceId(evidenceId));
     if (metadata.shape !== "json") throw new Error("jq is available only for JSON evidence.");
-    const query = this.queryRecord(evidenceId, "jq", expression);
+    const query = this.queryRecord(metadata.evidenceId, "jq", expression);
     if (!JQ_PATH) throw new Error("jq is unavailable on PATH.");
     const staged = await stageCommand(JQ_PATH, [expression, metadata.rawPath], {
       cwd: this.cwd, env: SAFE_COMMAND_ENV, timeoutMs: COMMAND_TIMEOUT_MS, maxBytes: MAX_ARTIFACT_BYTES,
@@ -426,7 +427,7 @@ export class ContextStore {
       const raw = await readFile(staged.path, "utf8");
       const output = boundedText(raw, MAX_JQ_BYTES);
       const outputEvidence = output.truncated || staged.outputLimitReached
-        ? await this.captureDerived(evidenceId, query.queryId, "jq_output", raw, staged.outputLimitReached ? "jq output (partial: artifact limit reached)" : "jq output")
+        ? await this.captureDerived(metadata.evidenceId, query.queryId, "jq_output", raw, staged.outputLimitReached ? "jq output (partial: artifact limit reached)" : "jq output")
         : undefined;
       await writeFile(join(this.queryDirectory, `${query.queryId}.jq`), expression + "\n");
       await this.recordQuery(query, outputEvidence?.evidenceId);
@@ -438,35 +439,59 @@ export class ContextStore {
     } finally { await rm(staged.directory, { recursive: true, force: true }); }
   }
 
-  async repl(input: { language: "python" | "bash"; code: string; evidenceIds?: string[]; workspacePaths?: string[] }): Promise<{ available: boolean; invocationId?: string; exitCode?: number; output?: string; outputEvidence?: EvidenceReference; reason?: string }> {
+  async repl(input: { language: "python" | "bash"; code: string; evidenceIds?: string[]; workspacePaths?: string[] }, signal?: AbortSignal): Promise<{ available: boolean; invocationId?: string; exitCode?: number; output?: string; outputEvidence?: EvidenceReference; reason?: string }> {
+    signal?.throwIfAborted();
     const runtime = await containerRuntime();
     if (!runtime) return { available: false, reason: "Docker or Podman is required; host execution is never used." };
     if (!input.code.trim() || Buffer.byteLength(input.code) > 32 * 1024) throw new Error("REPL code must be non-empty and at most 32KiB.");
     if ((input.evidenceIds?.length ?? 0) > 8 || (input.workspacePaths?.length ?? 0) > 8) throw new Error("At most eight evidence IDs and workspace paths may be staged.");
     const invocationId = createId("repl");
     const started = timestamp();
-    const stage = await mkdtemp(join(tmpdir(), "pi-context-flow-repl-"));
+    const workspace = await realpath(this.cwd);
+    const stagingRoot = await mkdtemp(join(tmpdir(), "pi-context-flow-repl-"));
+    const stage = join(stagingRoot, "inputs");
+    await mkdir(stage, { mode: 0o755 });
+    const containerName = `context-flow-${invocationId}`;
     const evidenceDir = join(stage, "evidence"); const workspaceDir = join(stage, "workspace");
     let stagedBytes = 0;
-    await mkdir(evidenceDir); await mkdir(workspaceDir);
+    let staged: StagedCommandResult | undefined;
+    await chmod(stage, 0o755);
+    await mkdir(evidenceDir, { mode: 0o755 }); await mkdir(workspaceDir, { mode: 0o755 });
+    await chmod(evidenceDir, 0o755); await chmod(workspaceDir, 0o755);
     try {
-      for (const id of input.evidenceIds ?? []) {
+      for (const reference of input.evidenceIds ?? []) {
+        const id = normalizeEvidenceId(reference);
         const metadata = await this.metadata(id);
-        stagedBytes = await copyLimited(metadata.rawPath, join(evidenceDir, `${id}.txt`), stagedBytes);
+        stagedBytes = await copyLimited(metadata.rawPath, join(evidenceDir, `${id}.txt`), stagedBytes, stage);
       }
       for (const path of input.workspacePaths ?? []) {
-        const requested = resolve(this.cwd, path);
-        assertReplWorkspacePathAllowed(this.cwd, requested);
+        if (isAbsolute(path)) throw new Error("REPL paths must be workspace-relative.");
+        const requested = resolve(workspace, path);
+        assertReplWorkspacePathAllowed(workspace, requested);
         const absolute = await realpath(requested);
-        assertReplWorkspacePathAllowed(this.cwd, absolute);
+        assertReplWorkspacePathAllowed(workspace, absolute);
         const info = await stat(absolute);
         if (!info.isFile()) throw new Error("Only regular workspace files may be staged.");
-        stagedBytes = await copyLimited(absolute, join(workspaceDir, relative(this.cwd, absolute).replaceAll(sep, "_")), stagedBytes);
+        stagedBytes = await copyLimited(absolute, join(workspaceDir, relative(workspace, absolute)), stagedBytes, stage);
       }
       const image = input.language === "python" ? "python:3.12-alpine" : "bash:5.2";
       const command = input.language === "python" ? ["python", "-c", input.code] : ["bash", "-c", input.code];
-      const args = ["run", "--rm", "--pull", "never", "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--pids-limit", "64", "--memory", "256m", "--cpus", "1", "--user", "65534:65534", "--env", "HOME=/tmp", "--workdir", "/tmp", "--tmpfs", "/tmp:rw,noexec,nosuid,size=16m", "-v", `${stage}:/inputs:ro`, image, ...command];
-      const staged = await stageCommand(runtime, args, { env: SAFE_COMMAND_ENV, timeoutMs: REPL_TIMEOUT_MS, maxBytes: MAX_ARTIFACT_BYTES });
+      const args = ["run", "--name", containerName, "--rm", "--pull", "never", "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--pids-limit", "64", "--memory", "256m", "--cpus", "1", "--user", "65534:65534", "--env", "HOME=/tmp", "--workdir", "/tmp", "--tmpfs", "/tmp:rw,noexec,nosuid,size=16m", "-v", `${stage}:/inputs:ro`, image, ...command];
+      try {
+        staged = await stageCommand(runtime, args, { env: SAFE_COMMAND_ENV, timeoutMs: REPL_TIMEOUT_MS, maxBytes: MAX_ARTIFACT_BYTES, signal });
+      } finally {
+        // Killing the CLI does not stop a daemon-owned workload. Remove it before returning.
+        try { await execFile(runtime, ["rm", "--force", containerName], { env: SAFE_COMMAND_ENV, timeout: 5000, maxBuffer: 64 * 1024 }); }
+        catch (error) {
+          if (!/no such container/i.test(String((error as { stderr?: string }).stderr))) {
+            throw new Error(`Cannot confirm REPL container cleanup (${containerName}); inspect the container runtime.`, { cause: error });
+          }
+        }
+      }
+      if (signal?.aborted) {
+        await this.run("INSERT INTO repl_invocations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [invocationId, JSON.stringify(input.evidenceIds ?? []), JSON.stringify(input.workspacePaths ?? []), input.language, input.code, JSON.stringify({ wallMs: REPL_TIMEOUT_MS, memory: "256m", pids: 64, inputBytes: MAX_REPL_INPUT_BYTES, responseBytes: MAX_QUERY_BYTES, artifactBytes: MAX_ARTIFACT_BYTES }), started, staged.exitCode ?? 1, null, "cancelled"]);
+        signal.throwIfAborted();
+      }
       const raw = await readFile(staged.path, "utf8");
       const output = boundedText(raw, MAX_QUERY_BYTES);
       const outputEvidence = output.truncated || staged.outputLimitReached
@@ -478,7 +503,10 @@ export class ContextStore {
       await this.run("INSERT INTO repl_invocations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [invocationId, JSON.stringify(input.evidenceIds ?? []), JSON.stringify(input.workspacePaths ?? []), input.language, input.code, JSON.stringify({ wallMs: REPL_TIMEOUT_MS, memory: "256m", pids: 64, inputBytes: MAX_REPL_INPUT_BYTES, responseBytes: MAX_QUERY_BYTES, artifactBytes: MAX_ARTIFACT_BYTES }), started, exitCode, outputEvidence?.evidenceId ?? null, status]);
       const notice = output.truncated || staged.outputLimitReached ? "\n[output truncated; inspect outputEvidence for retained derived output]" : "";
       return { available: true, invocationId, exitCode, output: output.text + notice, outputEvidence: outputEvidence ? this.referenceFor(outputEvidence) : undefined };
-    } finally { await rm(stage, { recursive: true, force: true }); }
+    } finally {
+      if (staged) await rm(staged.directory, { recursive: true, force: true });
+      await rm(stagingRoot, { recursive: true, force: true });
+    }
   }
 
   async observe(input: Omit<Observation, "observationId" | "timestamp">): Promise<Observation> {
@@ -508,12 +536,25 @@ export class ContextStore {
     }
     if (!row) throw new Error(`Unknown evidence ID: ${evidenceId}`);
     const dependencies = JSON.parse(String(row.dependencies_json ?? "[]")) as string[];
-    return { evidenceId, tool: String(row.tool), arguments: JSON.parse(String(row.arguments_json)), timestamp: String(row.timestamp), source: String(row.source), rawPath: String(row.raw_path), sizeBytes: Number(row.size_bytes), shape: String(row.shape) as EvidenceShape, sha256: String(row.sha256), dependencies };
+    return { evidenceId, tool: String(row.tool), arguments: JSON.parse(String(row.arguments_json)), timestamp: String(row.timestamp), source: String(row.source), rawPath: String(row.raw_path), sizeBytes: Number(row.size_bytes), shape: String(row.shape) as EvidenceShape, sha256: String(row.sha256), dependencies: dependencies.map(normalizeEvidenceId) };
   }
   private async indexText(metadata: EvidenceMetadata, raw: string): Promise<void> {
     const buffer = Buffer.from(raw); const ranges = lineRanges(buffer); let offset = 0; let index = 0;
-    while (offset < buffer.length) { let end = Math.min(buffer.length, offset + CHUNK_BYTES); if (end < buffer.length) { const newline = buffer.lastIndexOf(10, end); if (newline >= offset) end = newline + 1; }
-      await this.run("INSERT INTO text_chunks VALUES (?, ?, ?, ?, ?, ?, ?)", [metadata.evidenceId, index++, offset, end, lineAt(ranges, offset), lineAt(ranges, Math.max(offset, end - 1)), buffer.subarray(offset, end).toString("utf8")]); offset = end; }
+    let values: unknown[] = [];
+    const flush = async () => {
+      if (!values.length) return;
+      await this.run(`INSERT INTO text_chunks VALUES ${Array(values.length / 7).fill("(?, ?, ?, ?, ?, ?, ?)").join(",")}`, values);
+      values = [];
+    };
+    while (offset < buffer.length) {
+      let end = Math.min(buffer.length, offset + CHUNK_BYTES);
+      if (end < buffer.length) { const newline = buffer.lastIndexOf(10, end); if (newline >= offset) end = newline + 1; }
+      values.push(metadata.evidenceId, index++, offset, end, lineAt(ranges, offset), lineAt(ranges, Math.max(offset, end - 1)), buffer.subarray(offset, end).toString("utf8"));
+      offset = end;
+      // Amortize subprocess startup while keeping each database operation bounded.
+      if (values.length >= 64 * 7) await flush();
+    }
+    await flush();
     await this.run("INSERT INTO derived_materializations VALUES (?, ?, ?, ?, ?, ?)", [createId("materialization"), metadata.evidenceId, "lexical_chunks", null, JSON.stringify({ chunkBytes: CHUNK_BYTES }), timestamp()]);
   }
   private async indexMixed(metadata: EvidenceMetadata, raw: string): Promise<void> {
@@ -568,7 +609,8 @@ function waitForConnection(): Promise<void> {
   return new Promise((resolveWait) => setTimeout(resolveWait, 5));
 }
 
-async function stageCommand(command: string, args: string[], options: { cwd?: string; env: NodeJS.ProcessEnv; timeoutMs: number; maxBytes: number }): Promise<StagedCommandResult> {
+async function stageCommand(command: string, args: string[], options: { cwd?: string; env: NodeJS.ProcessEnv; timeoutMs: number; maxBytes: number; signal?: AbortSignal }): Promise<StagedCommandResult> {
+  options.signal?.throwIfAborted();
   const directory = await mkdtemp(join(tmpdir(), "pi-context-flow-output-"));
   const path = join(directory, "output.txt");
   const output = createWriteStream(path, { flags: "w" });
@@ -582,11 +624,15 @@ async function stageCommand(command: string, args: string[], options: { cwd?: st
   };
   child.stdout.on("data", append); child.stderr.on("data", append);
   child.on("error", (error) => { processError = error; });
+  const abort = () => { child.kill("SIGKILL"); };
+  options.signal?.addEventListener("abort", abort, { once: true });
+  if (options.signal?.aborted) abort();
   const timer = setTimeout(() => { timedOut = true; child.kill("SIGKILL"); }, options.timeoutMs);
   const [exitCode] = await onceProcessClose(child);
   clearTimeout(timer);
+  options.signal?.removeEventListener("abort", abort);
   await new Promise<void>((resolveOutput, rejectOutput) => output.end(() => resolveOutput()));
-  if (processError && exitCode === null && !timedOut && !outputLimitReached) throw processError;
+  if (processError) { await rm(directory, { recursive: true, force: true }); throw processError; }
   return { path, directory, exitCode, timedOut, outputLimitReached };
 }
 
@@ -626,7 +672,6 @@ function classify(raw: string, path?: string): EvidenceShape {
   return jsonLines > 0 || looksLog(raw) ? "mixed" : "text";
 }
 function looksDelimited(raw: string, delimiter: string): boolean { const lines = raw.split(/\r?\n/).filter(Boolean).slice(0, 3); return lines.length >= 2 && lines.every((line) => line.includes(delimiter)); }
-function looksYaml(raw: string): boolean { return /^(?:---\s*$|[A-Za-z_][\w-]*:\s*[^\n]*)/m.test(raw); }
 function parseYaml(raw: string): unknown { const document = parseDocument(raw, { prettyErrors: false }); if (document.errors.length || document.warnings.length) throw new Error(`YAML parsing failed: ${(document.errors[0] ?? document.warnings[0])?.message ?? "invalid document"}`); const value = document.toJS({ maxAliasCount: 0 }); assertStructuredValueBudget(value); return value; }
 function parseXml(raw: string): unknown { const valid = XMLValidator.validate(raw); if (valid !== true) throw new Error(`XML parsing failed: ${valid.err.msg}`); const value = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@", processEntities: false, parseTagValue: true, parseAttributeValue: false }).parse(raw); assertStructuredValueBudget(value); return value; }
 function assertStructuredValueBudget(value: unknown): void { let nodes = 0; const visit = (current: unknown, depth: number) => { if (++nodes > MAX_STRUCTURED_PARSE_NODES || depth > MAX_STRUCTURED_PARSE_DEPTH) throw new Error("Structured parser exceeded its node or depth limit."); if (Array.isArray(current)) for (const item of current) visit(item, depth + 1); else if (current && typeof current === "object") for (const item of Object.values(current as Record<string, unknown>)) visit(item, depth + 1); }; visit(value, 0); }
@@ -784,7 +829,20 @@ async function containerRuntime(): Promise<string | undefined> {
   }
   return undefined;
 }
-async function copyLimited(source: string, target: string, usedBytes: number): Promise<number> { const info = await stat(source); if (info.size > MAX_REPL_INPUT_BYTES || usedBytes + info.size > MAX_REPL_INPUT_BYTES) throw new Error(`Selected inputs exceed the ${MAX_REPL_INPUT_BYTES} byte REPL input limit.`); await mkdir(dirname(target), { recursive: true }); await copyFile(source, target); return usedBytes + info.size; }
+async function copyLimited(source: string, target: string, usedBytes: number, stage: string): Promise<number> {
+  const info = await stat(source);
+  if (info.size > MAX_REPL_INPUT_BYTES || usedBytes + info.size > MAX_REPL_INPUT_BYTES) throw new Error(`Selected inputs exceed the ${MAX_REPL_INPUT_BYTES} byte REPL input limit.`);
+  await mkdir(dirname(target), { recursive: true, mode: 0o755 });
+  // The private staging root stays 0700; only its mounted subtree is traversable by UID 65534.
+  for (let parent = dirname(target); parent !== stage; parent = dirname(parent)) {
+    if (!parent.startsWith(stage + sep)) throw new Error("Invalid staging destination");
+    await chmod(parent, 0o755);
+  }
+  await copyFile(source, target);
+  await chmod(target, 0o444);
+  return usedBytes + info.size;
+}
+
 async function closeDatabase(connection: duckdb.Connection, db: duckdb.Database): Promise<void> {
   // Timed queries may already have closed their isolated connection.
   await new Promise<void>((ok) => connection.close(() => ok()));

@@ -207,3 +207,14 @@ test("hook preserves colliding and non-object source details without overwriting
     assert.equal(result?.isError ?? false, false);
   }
 });
+
+test("hook leaves prose with YAML-looking lines or embedded JSON inline", async t => {
+  const h = await harness(t);
+  for (const raw of [
+    "Error: failure\n" + "    at handler (app.js:1:2)\n".repeat(400),
+    "Notes: explanatory prose\n" + "This document explains the design.\n".repeat(400),
+    "---\n# Markdown heading\n" + "This is prose.\n".repeat(800),
+    "An example follows:\n{\"x\":1}\n" + "This is explanatory prose.\n".repeat(400),
+  ]) assert.equal(await h.invoke([text(raw)]), undefined);
+  assert.deepEqual(await readdir(h.cwd), []);
+});

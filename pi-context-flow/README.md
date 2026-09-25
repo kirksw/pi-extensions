@@ -13,7 +13,8 @@ Context Out remains explicit and governed: observations and artifact candidates 
   Automatic CSV/TSV detection requires a simple unique header and consistent field counts across the complete quote-aware payload; ambiguous tables remain inline.
   Explicit extension-hinted CSV/TSV file capture retains its existing format detection.
   Log recognition requires every line to start with a severity label (optionally bracketed or preceded by an ISO-style timestamp) and a message.
-  Ambiguous multiline logs remain inline; JSONL and YAML detection are unchanged.
+  Ambiguous multiline logs remain inline.
+  Automatic JSONL capture requires every non-empty line to parse; YAML capture validates the complete document and rejects aliases, warnings, scalar prose, malformed documents, and ambiguous single-scalar-field mappings such as stack traces.
   Original object detail keys are preserved; colliding `contextFlow` details or non-object details are retained under `details.contextFlow.sourceDetails`.
   The original error flag is unchanged.
   Capture metadata and capabilities remain in result details; use `context_metadata` for model-visible provenance and `context_schema` for structured analysis.
@@ -89,7 +90,7 @@ Reassociation is not yet exposed as a tool.
 - `context_promote`: commit an artifact proposal for an active owned observation; never approve knowledge or write the target artifact.
 - `context_search_observations`: bounded lexical retrieval, with branch/revision filters and explicit history and cross-origin scope.
 - `context_read_observation`: retrieve a claim's lifecycle and provenance labels; optionally assess selected local support availability.
-- `context_inspect_observation`: inspect immutable supporting snapshots or history as paged JSON text, without raw evidence content.
+- `context_inspect_observation`: inspect supporting snapshots, history, or full observation and candidate text (`section: "content"`) as paged JSON text, without raw evidence content.
 - `context_observation_lifecycle`: explicitly retract, supersede, or link another supporting observation using the current head event as a predecessor.
 - `context_candidate_inbox`: list proposals, not approved repository knowledge.
 - `context_migrate_legacy`: explicit dry-run/import of consistent current-worktree legacy records; preserve old files and report unresolved records.
@@ -106,12 +107,18 @@ A post-commit projection failure returns the committed ID with a warning.
 Exclusive session locks are not automatically stolen after a crash; verify the former owner has stopped before manually removing an abandoned lock.
 
 Raw evidence remains worktree-local and can disappear while the observation survives.
+New observations record a validated worktree-relative capture directory so evidence captured from subdirectory sessions can be assessed from the same worktree.
+Older snapshots without that locator retain the worktree-root lookup; their original subdirectory cannot be inferred reliably.
 Availability is distinct from claim validity and source coverage: matching historical bytes do not prove a conclusion is current or correct.
 Local assessment has an 8 MiB/two-second cooperative budget; other-origin evidence is not opened and is reported as unavailable for missing origin directories, otherwise unverified.
 Query definitions in retained snapshots may contain sensitive literals.
 No automatic expiration, purge, raw-evidence copying, semantic consolidation, or artifact writing is implemented.
 
 Retrieval scans at most 1,000 rows or 1 MiB per page, with at most 100 results and a cooperative two-second query deadline.
+An observation or candidate too large for an empty response page returns an explicit preview and advances the cursor.
+Cursor positions use fixed-size ID hashes; exceptionally large historical identifiers that cannot fit a preview are explicitly omitted and labeled with an ID hash.
+Use `context_inspect_observation` with `section: "content"` for complete text; lifecycle and promotion checks use scoped internal lookups independent of display budgets.
+Historical query snapshots containing `evidence://` IDs are accepted by the projection without rewriting the event ledger.
 Tools use bounded responses below 64 KiB and explicit truncation/coverage; provenance inspection pages contain at most 2,000 UTF-16 characters.
 These query budgets do not bound initial replay or projection refresh: they currently scan and retain event history in memory.
 Native projection queries are not forcibly interrupted, and closed disposable cache files remain on disk.
@@ -182,4 +189,8 @@ git diff --check
 Empty jq output returns `null`, one document returns its value, and multiple documents return an ordered array.
 Pretty-printed documents and escaped strings are supported without changing retained raw output.
 `context_repl` requires a usable Docker or Podman server; its integration can be unavailable on development hosts without one.
+REPL inputs preserve workspace-relative directory structure beneath `/inputs/workspace`; evidence files use bare IDs beneath `/inputs/evidence`.
+Readable staged copies sit inside a private host directory and are mounted read-only for UID 65534.
+Each invocation has a unique container name and explicitly removes its container after completion, timeout, output overflow, or cancellation.
+Cleanup failures are reported rather than claiming successful cleanup.
 Runtime discovery resolves executables from the caller PATH and uses the resolved path for execution, without forwarding the caller environment.

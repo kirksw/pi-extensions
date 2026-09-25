@@ -164,3 +164,46 @@ test("review: restart then supersede and propose never writes authoritative docu
     assert.equal(await readFile(target, "utf8"), "Synthetic authoritative sentinel\n");
   } finally { await h.close(); await rm(root, { recursive: true, force: true }); }
 });
+
+test("URI queries and subdirectory captures remain retrievable with available support", async () => {
+  const { repo, home } = await fixture(), sub = join(repo, "sub"), h = harness(home);
+  await mkdir(sub);
+  try {
+    const capture = await h.tools.get("context_capture").execute("capture", { tool: "fixture", arguments: {}, payload: { value: 1 } }, undefined, undefined, { cwd: sub });
+    const evidenceId = `evidence://${capture.details.evidence.evidenceId}`;
+    const query = await h.tools.get("context_query_sql").execute("query", { evidenceId, sql: "SELECT value FROM evidence" }, undefined, undefined, { cwd: sub });
+    const created = await h.call("context_observe", { ...claim, queryIds: [query.details.queryId] }, sub);
+    const read = await h.call("context_read_observation", { observationId: created.observationId, assess: true }, sub);
+    assert.equal(read.results.length, 1);
+    assert.equal(read.supportAssessment.status, "available");
+    const rootRead = await h.call("context_read_observation", { observationId: created.observationId, assess: true }, repo);
+    assert.equal(rootRead.supportAssessment.status, "available");
+  } finally { await h.close(); }
+});
+
+test("escaped oversized claims and candidates remain inspectable and manageable", async () => {
+  const { repo, home } = await fixture(), h = harness(home);
+  try {
+    const text = "\u0001".repeat(11000);
+    const created = await h.call("context_observe", { ...claim, text }, repo);
+    const read = await h.call("context_read_observation", { observationId: created.observationId }, repo);
+    assert.equal(read.results[0].observationId, created.observationId);
+    assert.equal(read.results[0].truncated, true);
+    const page = await h.call("context_search_observations", {}, repo);
+    assert.equal(page.results.length, 1); assert.equal(page.scanComplete, true);
+    const candidate = await h.call("context_promote", { observationId: created.observationId, scope: "repo", target: "notes.md", rationale: "\\".repeat(12000) }, repo);
+    const inbox = await h.call("context_candidate_inbox", {}, repo);
+    assert.equal(inbox.results[0].candidateId, candidate.candidateId);
+    assert.equal(inbox.results[0].truncated, true); assert.equal(inbox.scanComplete, true);
+    let serialized = "", offset = 0;
+    for (;;) {
+      const chunk = await h.call("context_inspect_observation", { observationId: created.observationId, section: "content", offset }, repo);
+      serialized += chunk.chunk; if (chunk.complete) break; offset = chunk.nextOffset;
+    }
+    const content = JSON.parse(serialized);
+    assert.equal(content.observation.text, text);
+    assert.equal("requestHash" in content.candidates[0], false);
+    assert.equal(content.candidates[0].rationale, "\\".repeat(12000));
+    assert.equal((await h.call("context_observation_lifecycle", { observationId: created.observationId, predecessorEventId: created.eventId, action: "retract" }, repo)).committed, true);
+  } finally { await h.close(); }
+});

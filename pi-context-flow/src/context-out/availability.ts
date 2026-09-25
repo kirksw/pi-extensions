@@ -5,7 +5,7 @@ import { join, relative, sep } from "node:path";
 import type { ContextOutIdentity } from "./identity.js";
 import type { ContextOutEvent } from "./events.js";
 
-export type EvidenceSnapshot = { evidenceId: string; sha256: string; sizeBytes: number; shape: string; coverage: string };
+export type EvidenceSnapshot = { evidenceId: string; sha256: string; sizeBytes: number; shape: string; coverage: string; workspaceRelative?: string };
 export type Assessment = { reference: string; status: "available" | "unavailable" | "unverified"; reason: string; coverage: string; assessedAt: string };
 export function supportCoverage(items: Assessment[]) {
   const counts = { available: 0, unavailable: 0, unverified: 0 };
@@ -32,7 +32,9 @@ export async function assessEvidence(identity: ContextOutIdentity, origin: Conte
     if (!/^[a-zA-Z0-9_-]+$/.test(snapshot.evidenceId) || !/^[a-f0-9]{64}$/.test(snapshot.sha256)) { item.reason = "Invalid snapshot identity/hash"; continue; }
     if (Date.now() >= deadline || snapshot.sizeBytes > budget) continue;
     try {
-      const path = join(identity.worktreeRoot, ".pi", "context", "evidence", "raw", `${snapshot.evidenceId}.${snapshot.shape === "json" ? "json" : "txt"}`);
+      const workspace = snapshot.workspaceRelative ?? "";
+      if (!safeWorkspaceRelative(workspace)) throw new Error("Unsafe workspace locator");
+      const path = join(identity.worktreeRoot, workspace, ".pi", "context", "evidence", "raw", `${snapshot.evidenceId}.${snapshot.shape === "json" ? "json" : "txt"}`);
       const rel = relative(await realpath(identity.worktreeRoot), await realpath(path));
       if (rel === ".." || rel.startsWith(`..${sep}`)) throw new Error("Unsafe raw locator");
       const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
@@ -56,4 +58,9 @@ export async function assessEvidence(identity: ContextOutIdentity, origin: Conte
     }
   }
   return results;
+}
+
+export function safeWorkspaceRelative(value: unknown): value is string {
+  return typeof value === "string" && !value.includes("\\") && !value.includes("\0")
+    && (value === "" || value.split("/").every(part => part.length > 0 && part !== "." && part !== ".." && !part.includes(":")));
 }

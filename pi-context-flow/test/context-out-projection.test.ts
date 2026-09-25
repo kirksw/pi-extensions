@@ -108,7 +108,7 @@ test("bounded lexical pages, late matches, response limits, stale cursors and ex
   await w.append(creation("large", "x".repeat(16000))); await p.refresh();
   await assert.rejects(p.search({ cursor: page.nextCursor }), /cursor/);
   const bounded = await p.read("large", { responseBytes: 8192 });
-  assert.equal(bounded.results.length, 0); assert.equal(bounded.stopReason, "bytes");
+  assert.equal(bounded.results.length, 1); assert.equal((bounded.results[0] as unknown as { truncated: boolean }).truncated, true);
   assert.ok(Buffer.byteLength(JSON.stringify(bounded)) <= 8192);
   assert.equal((await p.read("large")).results.length, 1);
   await w.close();
@@ -133,4 +133,44 @@ test("later creation resolves references, subject/candidate collisions expose no
   assert.equal((await p.read("a")).results.length, 0);
   assert.equal((await p.candidates()).results.length, 0);
   assert.equal((await p.issues()).results.filter(i => i.kind === "conflict").length, 4);
+});
+
+test("historical query snapshots with evidence URIs project without rewriting events", async t => {
+  const identity = await fixture(t), writer = await openContextOutEventWriter(identity, "s");
+  const input = creation("uri-history");
+  const payload = { text: "Historical claim", category: "other", evidenceIds: [], queryIds: ["q"], support: "unverified",
+    provenance: { evidence: [{ evidenceId: "e", tool: "fixture", timestamp: "now", source: "fixture", shape: "json", sha256: "a".repeat(64), sizeBytes: 1, coverage: "unknown", dependencies: [] }],
+      queries: [{ queryId: "q", evidenceId: "evidence://e", language: "sql", query: "SELECT * FROM evidence", timestamp: "now", outputEvidenceId: null }] } };
+  await writer.append({ ...input, payload }); await writer.close();
+  const before = await replayContextOutEvents(identity);
+  const p = await openContextOutProjection(identity); t.after(() => p.close());
+  assert.equal((await p.read("uri-history")).results.length, 1);
+  assert.deepEqual(await replayContextOutEvents(identity), before);
+});
+
+test("oversized matching rows advance cursors and leave later claims reachable", async t => {
+  const identity = await fixture(t), writer = await openContextOutEventWriter(identity, "budget");
+  for (const [key, text] of [["a", "small"], ["b", "\\".repeat(12000)], ["c", "later"]]) await writer.append(creation(key, text));
+  await writer.close();
+  const projection = await openContextOutProjection(identity); t.after(() => projection.close());
+  const first = await projection.search({ responseBytes: 24000 });
+  assert.deepEqual(first.results.map(o => o.observationId), ["a"]);
+  const second = await projection.search({ responseBytes: 24000, cursor: first.nextCursor });
+  assert.deepEqual(second.results.map(o => o.observationId), ["b", "c"]);
+  assert.equal(second.scanComplete, true);
+  assert.ok(Buffer.byteLength(JSON.stringify(second)) <= 24000);
+});
+
+test("long historical identifiers cannot overflow previews or cursor budgets", async t => {
+  const identity = await fixture(t), writer = await openContextOutEventWriter(identity, "long-ids");
+  const longId = "b".repeat(4096);
+  await writer.append(creation(longId, "\u0001".repeat(11000)));
+  await writer.append(creation("z", "later")); await writer.close();
+  const projection = await openContextOutProjection(identity); t.after(() => projection.close());
+  const first = await projection.search({ responseBytes: 8192, limit: 1 });
+  assert.equal(first.results[0].observationId, longId);
+  assert.ok(Buffer.byteLength(JSON.stringify(first)) <= 8192);
+  const second = await projection.search({ responseBytes: 8192, limit: 1, cursor: first.nextCursor });
+  assert.equal(second.results[0].observationId, "z");
+  assert.equal(second.scanComplete, true);
 });

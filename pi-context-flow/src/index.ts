@@ -2,6 +2,7 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 import { ContextStore } from "./store.js";
+import { looksYaml } from "./yaml-format.js";
 import { looksLog } from "./log-format.js";
 import { looksDelimited } from "./delimited.js";
 import { ContextOutStore } from "./context-out/store.js";
@@ -115,7 +116,7 @@ export default function registerContextFlow(pi: ExtensionAPI, options: { home?: 
     name: "context_repl", label: "Sandboxed Evidence REPL",
     description: "Run Python or Bash only in Docker/Podman with no network, host execution, secrets, or writable inputs.",
     parameters: Type.Object({ language: StringEnum(["python", "bash"] as const), code: Type.String(), evidenceIds: Type.Optional(Type.Array(Type.String(), { maxItems: 8 })), workspacePaths: Type.Optional(Type.Array(Type.String(), { maxItems: 8 })) }),
-    async execute(_id, params, _signal, _update, ctx) { const store = await storeFor(ctx.cwd); const result = await store.repl(params); return output(store, result.outputEvidence?.evidenceId ?? "repl", result, { invocationId: result.invocationId }); },
+    async execute(_id, params, _signal, _update, ctx) { const store = await storeFor(ctx.cwd); const result = await store.repl(params, _signal); return output(store, result.outputEvidence?.evidenceId ?? "repl", result, { invocationId: result.invocationId }); },
   });
 
   const retryKey = Type.Optional(Type.String({ minLength: 1, maxLength: 4096 }));
@@ -134,7 +135,7 @@ export default function registerContextFlow(pi: ExtensionAPI, options: { home?: 
   pi.registerTool({ name: "context_read_observation", label: "Read Observation", description: "Read one scoped claim including lifecycle and recorded origin. Optional support inspection hashes fixed local raw files (8MiB/2 seconds); cross-origin support remains unverified or unavailable. At most 64KiB response.",
     parameters: Type.Object({ observationId: Type.String(), scope, assess: Type.Optional(Type.Boolean()) }), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.read(ctx.cwd, params.observationId, params)); } });
   pi.registerTool({ name: "context_inspect_observation", label: "Inspect Observation Provenance", description: "Inspect immutable provenance snapshots or event history in JSON-text chunks. Character offset pagination, 2000 characters per chunk, <=64KiB response. Query definitions may contain sensitive literals. No raw evidence content.",
-    parameters: Type.Object({ observationId: Type.String(), scope, section: StringEnum(["provenance", "history"] as const), offset: Type.Optional(Type.Integer({ minimum: 0 })) }), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.inspect(ctx.cwd, params.observationId, params)); } });
+    parameters: Type.Object({ observationId: Type.String(), scope, section: StringEnum(["provenance", "history", "content"] as const), offset: Type.Optional(Type.Integer({ minimum: 0 })) }), async execute(_id, params, _signal, _update, ctx) { return out(await contextOut.inspect(ctx.cwd, params.observationId, params)); } });
   pi.registerTool({ name: "context_observation_lifecycle", label: "Change Observation Lifecycle", description: "Explicitly retract, supersede, or link another supporting observation. Requires current head event as predecessor and same-worktree active ownership. Does not approve or delete anything.",
     parameters: Type.Object({ observationId: Type.String(), action: StringEnum(["retract", "supersede", "link_support"] as const), predecessorEventId: Type.String(), relatedObservationId: Type.Optional(Type.String()), reason: Type.Optional(Type.String()), retryKey }),
     async execute(id, params, _signal, _update, ctx) { return out(await contextOut.lifecycle(ctx.cwd, ctx.sessionManager.getSessionId(), params.retryKey ?? id, params)); } });
@@ -186,6 +187,6 @@ export function shouldAutoCapture(raw: string): boolean {
   const jsonLines = lines.filter((line) => { try { JSON.parse(line); return true; } catch { return false; } }).length;
   const delimited = looksDelimited(raw, ",") || looksDelimited(raw, "\t");
   const xml = /^\s*<\?xml(?:\s|\?>)/u.test(raw);
-  const yaml = /^(?:---\s*$|[A-Za-z_][\w-]*:\s*(?:[^\n]*)$)/m.test(raw);
-  return jsonLines > 0 || delimited || xml || yaml || looksLog(raw);
+  const yaml = looksYaml(raw, true);
+  return (lines.length > 0 && jsonLines === lines.length) || delimited || xml || yaml || looksLog(raw);
 }

@@ -1,9 +1,10 @@
+import { safeWorkspaceRelative } from "./availability.js";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import type { ContextStore } from "../store.js";
 import type { Observation } from "../types.js";
 import { realpath } from "node:fs/promises";
-import { dirname } from "node:path";
+import { dirname, relative, sep } from "node:path";
 import type { ContextOutEventInput, RevisionMetadata } from "./events.js";
 import type { ContextOutIdentity } from "./identity.js";
 
@@ -45,6 +46,11 @@ export async function prepareObservationEvent(
   } catch { throw new Error("Cannot verify observation evidence origin"); }
   if (storeWorktree !== await realpath(identity.worktreeRoot)) throw new Error("Observation evidence belongs to a different worktree");
   const payload = await prepareObservation(store, input);
+  const workspace = await realpath(dirname(dirname(store.root)));
+  const workspaceRelative = relative(await realpath(identity.worktreeRoot), workspace).split(sep).join("/");
+  if (!safeWorkspaceRelative(workspaceRelative)) throw new Error("Unsafe observation workspace locator");
+  const provenance = { ...payload.provenance, evidence: payload.provenance.evidence.map(e => ({ ...e, workspaceRelative })) };
+  if (Buffer.byteLength(JSON.stringify(provenance)) > 192 * 1024) throw new Error("Observation provenance exceeds 192 KiB");
   const origin = await originSnapshot(identity);
   const metadata: RevisionMetadata = {
     branch: origin.branch, revision: origin.revision,
@@ -52,5 +58,5 @@ export async function prepareObservationEvent(
     workingTree: origin.dirty === "unknown" ? "unknown" : origin.dirty ? "dirty" : "clean",
   };
   return { idempotencyKey: input.idempotencyKey, subjectId: input.observationId.replace(/^observation:\/\//, ""),
-    type: "observation.created", metadata, payload };
+    type: "observation.created", metadata, payload: { ...payload, provenance } };
 }

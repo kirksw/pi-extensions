@@ -22,6 +22,7 @@ export function reviewProcess(cwd: string, env: NodeJS.ProcessEnv = { PATH: proc
         child.send(message, (error) => { if (error) { cleanup(); reject(error); } });
       });
     },
+    cancel() { child.send({ op: "cancel" }); },
     async stop() { clearTimeout(deadline); child.kill("SIGKILL"); await closed; },
   };
 }

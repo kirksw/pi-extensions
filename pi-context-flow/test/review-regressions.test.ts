@@ -70,7 +70,7 @@ test("review: jq oversized stream stays bounded with retained evidence", { skip:
 
 test("review: container CLI discovered and executed from nonstandard PATH without secrets", async (t) => {
   const h = await fixture(t), bin = join(h.cwd, "nonstandard-bin"); await mkdir(bin);
-  const script = `#!${process.execPath}\nif (process.env.REVIEW_FAKE_SECRET) process.exit(42);\nif (process.argv[2] === 'version') console.log('fixture-server');\nelse if (process.argv[2] === 'run') console.log('fixture-ok');\nelse process.exit(43);\n`;
+  const script = `#!${process.execPath}\nif (process.env.REVIEW_FAKE_SECRET) process.exit(42);\nif (process.argv[2] === 'version') console.log('fixture-server');\nelse if (process.argv[2] === 'run') console.log('fixture-ok');\nelse if (process.argv[2] === 'rm') process.exit(0);\nelse process.exit(43);\n`;
   for (const name of ["docker", "podman"]) await writeFile(join(bin, name), script, { mode: 0o755 });
   const worker = h.worker({ PATH: bin, REVIEW_FAKE_SECRET: "synthetic-not-a-secret" });
   await worker.call({ op: "init" });

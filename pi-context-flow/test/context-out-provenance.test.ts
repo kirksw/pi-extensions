@@ -78,3 +78,21 @@ test("validated observation events commit only after local provenance is resolve
     await assert.rejects(prepareObservationEvent(otherStore, identity, input), /different worktree/);
   } finally { await writer.close(); }
 });
+
+test("workspace evidence locators reject traversal, absolute paths and symlink escapes", async t => {
+  const { execFileSync } = await import("node:child_process");
+  const { mkdir, writeFile, symlink, rm } = await import("node:fs/promises");
+  const { createHash } = await import("node:crypto");
+  const { assessEvidence, safeWorkspaceRelative } = await import("../src/context-out/availability.js");
+  const { resolveContextOutIdentity } = await import("../src/context-out/identity.js");
+  const root = await mkdtemp(join(tmpdir(), "context-out-locator-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const repo = join(root, "repo"), outside = join(root, "outside"); await mkdir(repo); await mkdir(outside);
+  execFileSync("git", ["init", "-q", repo]);
+  const identity = await resolveContextOutIdentity(repo, { home: join(root, "home") });
+  for (const path of ["../outside", "/outside", "a/../b", "a\\b", "C:/outside", "a\0b"]) assert.equal(safeWorkspaceRelative(path), false);
+  const directory = join(outside, ".pi", "context", "evidence", "raw"); await mkdir(directory, { recursive: true });
+  await writeFile(join(directory, "e.json"), "{}"); await symlink(outside, join(repo, "escape"));
+  const snapshots = [{ evidenceId: "e", shape: "json", sha256: createHash("sha256").update("{}").digest("hex"), sizeBytes: 2, coverage: "unknown", workspaceRelative: "escape" }];
+  assert.equal((await assessEvidence(identity, identity, snapshots))[0].status, "unverified");
+});

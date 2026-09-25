@@ -1,3 +1,4 @@
+import { safeWorkspaceRelative } from "./availability.js";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp } from "node:fs/promises";
 import { join } from "node:path";
@@ -48,6 +49,8 @@ const object = (value: unknown): Record<string, unknown> => {
 };
 const id = (v: unknown): string => { if (typeof v !== "string" || !v.length || v.length > 4096 || v.includes("://")) throw new Error("Expected bare ID"); return v; };
 const string = (v: unknown): string => { if (typeof v !== "string") throw new Error("Expected string"); return v; };
+// Older query snapshots retained the display URI; normalize only in the projection.
+const evidenceId = (v: unknown) => id(typeof v === "string" ? v.replace(/^evidence:\/\//, "") : v);
 const ids = (v: unknown): string[] => { if (!Array.isArray(v) || v.length > 128) throw new Error("Expected bounded references"); return v.map(id); };
 const sameOrigin = (a: ContextOutEvent, b: ContextOutEvent) => ["repositoryId", "cloneId", "worktreeId"].every(k => a.origin[k as keyof typeof a.origin] === b.origin[k as keyof typeof b.origin]);
 
@@ -63,17 +66,18 @@ function validateCreation(e: ContextOutEvent): Record<string, unknown> {
     if (evidence.has(key) || "rawPath" in v || "arguments" in v || !["unknown", "partial"].includes(string(v.coverage))) throw new Error("Invalid evidence snapshot");
     for (const field of ["tool", "timestamp", "source", "shape", "sha256"]) string(v[field]);
     if (!Number.isSafeInteger(v.sizeBytes) || Number(v.sizeBytes) < 0) throw new Error("Invalid evidence size");
+    if (v.workspaceRelative !== undefined && !safeWorkspaceRelative(v.workspaceRelative)) throw new Error("Invalid workspace locator");
     ids(v.dependencies); evidence.set(key, v);
   }
   for (const raw of provenance.queries) {
     const v = object(raw), key = id(v.queryId);
     if (queries.has(key) || !["sql", "jq"].includes(string(v.language))) throw new Error("Invalid query snapshot");
-    string(v.query); string(v.timestamp); id(v.evidenceId);
+    string(v.query); string(v.timestamp); evidenceId(v.evidenceId);
     if (v.outputEvidenceId !== null) id(v.outputEvidenceId);
     queries.set(key, v);
   }
   const refs = [...evidenceIds, ...[...evidence.values()].flatMap(v => ids(v.dependencies)),
-    ...[...queries.values()].flatMap(v => [id(v.evidenceId), ...(v.outputEvidenceId === null ? [] : [id(v.outputEvidenceId)])])];
+    ...[...queries.values()].flatMap(v => [evidenceId(v.evidenceId), ...(v.outputEvidenceId === null ? [] : [id(v.outputEvidenceId)])])];
   if (refs.some(ref => !evidence.has(ref)) || queryIds.some(ref => !queries.has(ref))) throw new Error("Missing provenance snapshot reference");
   if (p.support !== (evidence.size ? "unverified" : "unsupported")) throw new Error("Invalid support label");
   return p;
@@ -234,6 +238,15 @@ export class ContextOutProjection {
   read(observationId: string, input: Omit<ProjectionQuery, "query" | "cursor" | "history"> = {}): Promise<ProjectionPage<ProjectedObservation>> {
     return this.page("observation", { ...input, history: true }, id(observationId.replace(/^observation:\/\//, "")));
   }
+  /** Internal lifecycle lookup is scoped but independent of model response budgets. */
+  lookup(observationId: string, scope: "worktree" | "repository" = "worktree"): Promise<ProjectedObservation | undefined> {
+    return this.serialized(async () => {
+      const where = scope === "repository" ? "" : " AND clone_id = ? AND worktree_id = ?";
+      const values = [id(observationId.replace(/^observation:\/\//, "")), ...(scope === "repository" ? [] : [this.identity.cloneId, this.identity.worktreeId])];
+      const row = (await this.all(`SELECT body FROM items WHERE kind = 'observation' AND id = ?${where}`, values))[0];
+      return row ? JSON.parse(String(row.body)) : undefined;
+    });
+  }
   /** Explicit immutable event history, including original provenance snapshots; oversized rows report bytes. */
   history(input: ProjectionQuery = {}): Promise<ProjectionPage<ContextOutEvent>> { return this.page("event", input); }
   candidates(input: ProjectionQuery = {}): Promise<ProjectionPage<ProjectedCandidate>> { return this.page("candidate", input); }
@@ -258,8 +271,13 @@ export class ContextOutProjection {
       if (input.cursor) {
         if (input.cursor.length > 16384) throw new Error("Invalid cursor");
         const cursor = JSON.parse(Buffer.from(input.cursor, "base64url").toString());
-        if (cursor.generation !== this.coverage.generation || cursor.fingerprint !== fingerprint || typeof cursor.after !== "string") throw new Error("Stale or mismatched projection cursor");
-        after = cursor.after;
+        if (cursor.generation !== this.coverage.generation || cursor.fingerprint !== fingerprint) throw new Error("Stale or mismatched projection cursor");
+        if (typeof cursor.afterHash === "string" && /^[a-f0-9]{64}$/.test(cursor.afterHash)) {
+          const row = (await this.all("SELECT id FROM items WHERE kind = ? AND sha256(id) = ?", [kind, cursor.afterHash]))[0];
+          if (!row) throw new Error("Invalid projection cursor position");
+          after = String(row.id);
+        } else if (typeof cursor.after === "string") after = cursor.after;
+        else throw new Error("Invalid projection cursor");
       }
       const where = ["kind = ?", "id > ?"], values: unknown[] = [kind, after];
       if (input.scope !== "repository") { where.push("clone_id = ?", "worktree_id = ?"); values.push(this.identity.cloneId, this.identity.worktreeId); }
@@ -279,19 +297,29 @@ export class ContextOutProjection {
         if (page.scanned >= scanLimit) { page.stopReason = "scan"; break; }
         const body = String(row.body), size = Buffer.byteLength(body);
         if (page.scannedBytes + size > PROJECTION_LIMITS.scanBytes) { page.stopReason = "scan"; break; }
-        const value = JSON.parse(body);
+        let value = JSON.parse(body);
         const searchable = kind === "observation" ? `${value.text} ${value.category}` : body;
         const matches = terms.every(term => searchable.toLowerCase().includes(term));
         if (matches && page.results.length >= limit) { page.stopReason = "results"; break; }
-        // Reserve room for coverage, cursor, and counters, including a maximum-length subject ID.
-        const nextCursor = Buffer.from(json({ generation: this.coverage.generation, fingerprint, after: String(row.id) })).toString("base64url");
-        if (matches && Buffer.byteLength(JSON.stringify({ ...page, results: [...page.results, value], nextCursor })) + 256 > byteLimit) {
-          page.stopReason = "bytes"; break;
+        // Hash cursor positions so long historical IDs cannot dominate response budgets.
+        const nextCursor = Buffer.from(json({ generation: this.coverage.generation, fingerprint, afterHash: createHash("sha256").update(String(row.id)).digest("hex") })).toString("base64url");
+        const fits = (item: unknown) => Buffer.byteLength(JSON.stringify({ ...page, results: [...page.results, item], nextCursor })) + 256 <= byteLimit;
+        if (matches && !fits(value)) {
+          if (page.results.length) { page.stopReason = "bytes"; break; }
+          // An item that cannot fit an empty page must not trap the cursor forever.
+          value = { ...(kind === "observation" ? { observationId: value.observationId, state: value.state, headEventId: value.headEventId }
+            : kind === "candidate" ? { candidateId: value.candidateId, observationId: value.observationId, status: value.status } : { id: String(row.id) }),
+            truncated: true, preview: body.slice(0, 512),
+            warning: "Item exceeds response budget; use context_inspect_observation content/history for paged full text." };
+          while (!fits(value) && value.preview.length) value.preview = value.preview.slice(0, Math.floor(value.preview.length / 2));
+          if (!fits(value)) value = { truncated: true, idHash: createHash("sha256").update(String(row.id)).digest("hex"),
+            warning: "Item identifiers exceed response budget; inspect by its original ledger ID.", identifiersOmitted: true };
+          if (!fits(value)) throw new Error("Response budget cannot fit an item marker");
         }
         page.scanned++; page.scannedBytes += size; after = String(row.id); values[1] = after;
         if (matches) page.results.push(value);
       }
-      if (!page.scanComplete) page.nextCursor = Buffer.from(json({ generation: this.coverage.generation, fingerprint, after })).toString("base64url");
+      if (!page.scanComplete) page.nextCursor = Buffer.from(json({ generation: this.coverage.generation, fingerprint, ...(after ? { afterHash: createHash("sha256").update(after).digest("hex") } : { after: "" }) })).toString("base64url");
       return page;
     });
   }
